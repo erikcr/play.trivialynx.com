@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { HStack, Text, VStack, Box, Heading } from "@gluestack-ui/themed";
+import {
+  HStack,
+  Text,
+  VStack,
+  Box,
+  Heading,
+  Divider,
+} from "@gluestack-ui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import GuestLayout from "../layouts/GuestLayout";
+
+import { supabase } from "../utils/supabase";
 
 function MobileHeader({
   teamName,
@@ -35,17 +44,35 @@ function MobileHeader({
 const Main = () => {
   const [teamName, setTeamName] = useState("");
   const [eventData, setEventData] = useState({});
+  const [allTeams, setAllTeams] = useState([]);
+
+  const getTeamName = async () => {
+    const tn = (await AsyncStorage.getItem("teamName")) || "";
+    setTeamName(tn);
+  };
+
+  const getAllTeams = async (eventId: string) => {
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
+      .select()
+      .eq("event_id", eventId);
+
+    if (data) {
+      console.log(data);
+      setAllTeams(data);
+    }
+  };
+
+  const getEventData = async () => {
+    const ed = JSON.parse((await AsyncStorage.getItem("eventData")) || "");
+    setEventData(ed);
+
+    if (Object.hasOwn(ed, "id")) {
+      getAllTeams(ed.id);
+    }
+  };
 
   useEffect(() => {
-    const getTeamName = async () => {
-      const tn = (await AsyncStorage.getItem("teamName")) || "";
-      setTeamName(tn);
-    };
-    const getEventData = async () => {
-      const ed = (await AsyncStorage.getItem("eventData")) || "";
-      setEventData(JSON.parse(ed));
-    };
-
     getTeamName();
     getEventData();
   }, []);
@@ -70,7 +97,7 @@ const Main = () => {
         py="$8"
         flex={1}
         bg="$backgroundLight0"
-        justifyContent="space-between"
+        justifyContent="flex-start"
         borderTopLeftRadius="$2xl"
         borderTopRightRadius="$2xl"
         borderBottomRightRadius="$none"
@@ -93,15 +120,51 @@ const Main = () => {
             "@md": { display: "flex", fontSize: "$2xl" },
           }}
         >
-          {/* {teamName} */}
+          {teamName}
         </Text>
 
-        <HStack
-          space="xs"
-          alignItems="center"
-          justifyContent="center"
-          mt="auto"
-        ></HStack>
+        <Box>
+          <Heading
+            mb="$4"
+            sx={{
+              "@md": { display: "flex", fontSize: "$2xl" },
+            }}
+          >
+            Teams
+          </Heading>
+
+          <VStack mx="$3">
+            {allTeams.map((item, index) => (
+              <>
+                <HStack flex={1} justifyContent="space-between" key={item.id}>
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    0
+                  </Text>
+                </HStack>
+
+                {index < allTeams.length - 1 && <Divider mb="$2" />}
+              </>
+            ))}
+          </VStack>
+        </Box>
       </Box>
     </>
   );
