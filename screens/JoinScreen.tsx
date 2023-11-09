@@ -21,6 +21,7 @@ import {
   Image,
   Heading,
 } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -91,6 +92,12 @@ const JoinEventForm = () => {
         },
       });
     } else {
+      const eventToJoin = data[0];
+
+      await AsyncStorage.setItem("joinCode", _data.joinCode);
+      await AsyncStorage.setItem("teamName", _data.teamName);
+      await AsyncStorage.setItem("eventData", JSON.stringify(eventToJoin));
+
       router.push("/play");
     }
   };

@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { HStack, Text, VStack, Box, Heading } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import GuestLayout from "../layouts/GuestLayout";
 
-function MobileHeader() {
+function MobileHeader({
+  teamName,
+  eventData,
+}: {
+  teamName: string;
+  eventData: Object;
+}) {
   return (
     <VStack px="$3" mt="$4.5" space="md">
       <VStack space="xs" ml="$1" my="$4">
         <Heading color="$textLight50" sx={{ _dark: { color: "$textDark50" } }}>
-          Event name
+          {eventData.name}
         </Heading>
         <Text
           fontSize="$md"
@@ -18,7 +25,7 @@ function MobileHeader() {
             _dark: { color: "$textDark400" },
           }}
         >
-          Team name
+          {teamName}
         </Text>
       </VStack>
     </VStack>
@@ -26,10 +33,27 @@ function MobileHeader() {
 }
 
 const Main = () => {
+  const [teamName, setTeamName] = useState("");
+  const [eventData, setEventData] = useState({});
+
+  useEffect(() => {
+    const getTeamName = async () => {
+      const tn = (await AsyncStorage.getItem("teamName")) || "";
+      setTeamName(tn);
+    };
+    const getEventData = async () => {
+      const ed = (await AsyncStorage.getItem("eventData")) || "";
+      setEventData(JSON.parse(ed));
+    };
+
+    getTeamName();
+    getEventData();
+  }, []);
+
   return (
     <>
       <Box sx={{ "@md": { display: "none" } }}>
-        <MobileHeader />
+        <MobileHeader teamName={teamName} eventData={eventData} />
       </Box>
 
       <Box
@@ -69,7 +93,7 @@ const Main = () => {
             "@md": { display: "flex", fontSize: "$2xl" },
           }}
         >
-          Team name
+          {/* {teamName} */}
         </Text>
 
         <HStack
