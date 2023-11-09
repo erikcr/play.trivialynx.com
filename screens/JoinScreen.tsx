@@ -11,6 +11,7 @@ import {
   Toast,
   Box,
   ToastTitle,
+  ToastDescription,
   InputField,
   FormControlError,
   FormControlErrorIcon,
@@ -29,6 +30,8 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import GuestLayout from "../layouts/GuestLayout";
 
+import { supabase } from "../utils/supabase";
+
 import { styled } from "@gluestack-style/react";
 
 const StyledImage = styled(Image, {
@@ -41,7 +44,10 @@ const StyledImage = styled(Image, {
 });
 
 const joinEventSchema = z.object({
-  joinCode: z.string().min(1, "Join code is required"),
+  joinCode: z
+    .string()
+    .min(1, "Join code is required")
+    .regex(new RegExp("^\\d+$"), "Join code must be a number"),
   teamName: z.string().min(3, "C'mon you can do better than that"),
 });
 
@@ -61,8 +67,32 @@ const JoinEventForm = () => {
 
   const toast = useToast();
 
-  const onSubmit = (_data: JoinEventSchemaType) => {
-    router.push("/play");
+  const onSubmit = async (_data: JoinEventSchemaType) => {
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_EVENTS_TABLE_NAME)
+      .select()
+      .limit(1)
+      .eq("join_code", _data.joinCode);
+
+    if (!data?.length) {
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          return (
+            <Toast nativeID={id} action="error">
+              <VStack space="xs">
+                <ToastTitle>Invalid join code</ToastTitle>
+                <ToastDescription>
+                  Please double check the code you entered
+                </ToastDescription>
+              </VStack>
+            </Toast>
+          );
+        },
+      });
+    } else {
+      router.push("/play");
+    }
   };
 
   const handleKeyPress = () => {
