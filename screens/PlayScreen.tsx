@@ -8,6 +8,8 @@ import {
   ButtonText,
   Heading,
   Divider,
+  Input,
+  InputField,
   ScrollView,
 } from "@gluestack-ui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -50,6 +52,7 @@ const Main = () => {
   const [allTeams, setAllTeams] = useState([]);
   const [allRounds, setAllRounds] = useState([]);
   const [activeTab, setActiveTab] = useState("rounds");
+  const [activeRoundIndex, setActiveRoundIndex] = useState(0);
 
   const getTeamName = async () => {
     const tn = (await AsyncStorage.getItem("teamName")) || "";
@@ -75,7 +78,9 @@ const Main = () => {
       id,
       name,
       ${process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME} (
-        question
+        id,
+        question,
+        points
       )
       `
       )
@@ -111,7 +116,6 @@ const Main = () => {
       </Box>
 
       <Box
-        px="$4"
         sx={{
           "@md": {
             px: "$8",
@@ -176,53 +180,83 @@ const Main = () => {
               Teams
             </Heading>
           </HStack>
-
-          {activeTab === "rounds" && (
-            <VStack>
-              <HStack>
-                {allRounds.map((item) => (
-                  <Button key={item.id} h="$8" mx="$1">
-                    <ButtonText size="sm">{item.name}</ButtonText>
-                  </Button>
-                ))}
-              </HStack>
-            </VStack>
-          )}
-
-          {activeTab === "teams" && (
-            <VStack mx="$3">
-              {allTeams.map((item, index) => (
-                <Box key={item.id}>
-                  <HStack flex={1} justifyContent="space-between">
-                    <Text
-                      fontSize="$md"
-                      fontWeight="normal"
-                      mb="$2"
-                      sx={{
-                        "@md": { display: "flex", fontSize: "$2xl" },
-                      }}
-                    >
-                      {item.name}
-                    </Text>
-
-                    <Text
-                      fontSize="$md"
-                      fontWeight="normal"
-                      mb="$2"
-                      sx={{
-                        "@md": { display: "flex", fontSize: "$2xl" },
-                      }}
-                    >
-                      0
-                    </Text>
-                  </HStack>
-
-                  {index < allTeams.length - 1 && <Divider mb="$2" />}
-                </Box>
-              ))}
-            </VStack>
-          )}
         </Box>
+
+        {activeTab === "rounds" && (
+          <VStack>
+            <ScrollView
+              mb="$6"
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              {allRounds.map((item, index) => (
+                <Button
+                  key={item.id}
+                  h="$8"
+                  mx="$1"
+                  variant={activeRoundIndex === index ? "solid" : "outline"}
+                  onPress={() => {
+                    setActiveRoundIndex(index);
+                  }}
+                >
+                  <ButtonText size="sm">{item.name}</ButtonText>
+                </Button>
+              ))}
+            </ScrollView>
+
+            <ScrollView>
+              {allRounds.length > 0 &&
+                allRounds[activeRoundIndex][
+                  process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
+                ].map((item, index) => (
+                  <Box h="$56" key={item.id} mb="$4" px="$2">
+                    <Heading pb="$1">Question {index + 1}</Heading>
+                    <Text size="sm" pb="$1" bold>
+                      Points: {item.points}
+                    </Text>
+                    <Text pb="$2">{item.question}</Text>
+                    <Input>
+                      <InputField placeholder="Your answer" />
+                    </Input>
+                  </Box>
+                ))}
+            </ScrollView>
+          </VStack>
+        )}
+
+        {activeTab === "teams" && (
+          <VStack mx="$3">
+            {allTeams.map((item, index) => (
+              <Box key={item.id}>
+                <HStack flex={1} justifyContent="space-between">
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    0
+                  </Text>
+                </HStack>
+
+                {index < allTeams.length - 1 && <Divider mb="$2" />}
+              </Box>
+            ))}
+          </VStack>
+        )}
       </Box>
     </>
   );
