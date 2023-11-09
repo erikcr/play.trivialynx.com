@@ -4,8 +4,11 @@ import {
   Text,
   VStack,
   Box,
+  Button,
+  ButtonText,
   Heading,
   Divider,
+  ScrollView,
 } from "@gluestack-ui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -45,6 +48,7 @@ const Main = () => {
   const [teamName, setTeamName] = useState("");
   const [eventData, setEventData] = useState({});
   const [allTeams, setAllTeams] = useState([]);
+  const [allRounds, setAllRounds] = useState([]);
   const [activeTab, setActiveTab] = useState("rounds");
 
   const getTeamName = async () => {
@@ -59,8 +63,29 @@ const Main = () => {
       .eq("event_id", eventId);
 
     if (data) {
-      console.log(data);
       setAllTeams(data);
+    }
+  };
+
+  const getAllRounds = async (eventId: string) => {
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME)
+      .select(
+        `
+      id,
+      name,
+      ${process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME} (
+        question
+      )
+      `
+      )
+      .eq("event_id", eventId);
+
+    if (data) {
+      console.log(data);
+      setAllRounds(data);
+    } else if (error) {
+      throw error;
     }
   };
 
@@ -70,6 +95,7 @@ const Main = () => {
 
     if (Object.hasOwn(ed, "id")) {
       getAllTeams(ed.id);
+      getAllRounds(ed.id);
     }
   };
 
@@ -150,6 +176,18 @@ const Main = () => {
               Teams
             </Heading>
           </HStack>
+
+          {activeTab === "rounds" && (
+            <VStack>
+              <HStack>
+                {allRounds.map((item) => (
+                  <Button key={item.id} h="$8" mx="$1">
+                    <ButtonText size="sm">{item.name}</ButtonText>
+                  </Button>
+                ))}
+              </HStack>
+            </VStack>
+          )}
 
           {activeTab === "teams" && (
             <VStack mx="$3">
