@@ -77,7 +77,7 @@ function HeaderLogo() {
       <StyledImage
         alt="gluestack-ui Pro"
         resizeMode="contain"
-        source={require("./assets/images/gluestackUiProLogo_web_light.svg")}
+        source={require("./assets/images/appLogo.png")}
         sx={{
           "@md": {
             display: "flex",
@@ -94,7 +94,7 @@ function HeaderLogo() {
         }}
         alt="gluestack-ui Pro"
         display="flex"
-        source={require("./assets/images/gluestackUiProLogo_mobile.png")}
+        source={require("./assets/images/appLogo.png")}
       />
     </Box>
   );
