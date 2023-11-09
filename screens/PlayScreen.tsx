@@ -45,6 +45,7 @@ const Main = () => {
   const [teamName, setTeamName] = useState("");
   const [eventData, setEventData] = useState({});
   const [allTeams, setAllTeams] = useState([]);
+  const [activeTab, setActiveTab] = useState("rounds");
 
   const getTeamName = async () => {
     const tn = (await AsyncStorage.getItem("teamName")) || "";
@@ -124,46 +125,65 @@ const Main = () => {
         </Text>
 
         <Box>
-          <Heading
-            mb="$4"
-            sx={{
-              "@md": { display: "flex", fontSize: "$2xl" },
-            }}
-          >
-            Teams
-          </Heading>
+          <HStack flex={1} justifyContent="space-around">
+            <Heading
+              mb="$4"
+              sx={{
+                "@md": { display: "flex", fontSize: "$2xl" },
+              }}
+              color={activeTab === "rounds" ? "$black" : "$light500"}
+              borderBottomWidth={activeTab === "rounds" ? 1 : 0}
+              onPress={() => setActiveTab("rounds")}
+            >
+              Rounds
+            </Heading>
 
-          <VStack mx="$3">
-            {allTeams.map((item, index) => (
-              <>
-                <HStack flex={1} justifyContent="space-between" key={item.id}>
-                  <Text
-                    fontSize="$md"
-                    fontWeight="normal"
-                    mb="$2"
-                    sx={{
-                      "@md": { display: "flex", fontSize: "$2xl" },
-                    }}
-                  >
-                    {item.name}
-                  </Text>
+            <Heading
+              mb="$4"
+              sx={{
+                "@md": { display: "flex", fontSize: "$2xl" },
+              }}
+              color={activeTab === "teams" ? "$black" : "$light500"}
+              borderBottomWidth={activeTab === "teams" ? 1 : 0}
+              onPress={() => setActiveTab("teams")}
+            >
+              Teams
+            </Heading>
+          </HStack>
 
-                  <Text
-                    fontSize="$md"
-                    fontWeight="normal"
-                    mb="$2"
-                    sx={{
-                      "@md": { display: "flex", fontSize: "$2xl" },
-                    }}
-                  >
-                    0
-                  </Text>
-                </HStack>
+          {activeTab === "teams" && (
+            <VStack mx="$3">
+              {allTeams.map((item, index) => (
+                <Box key={item.id}>
+                  <HStack flex={1} justifyContent="space-between">
+                    <Text
+                      fontSize="$md"
+                      fontWeight="normal"
+                      mb="$2"
+                      sx={{
+                        "@md": { display: "flex", fontSize: "$2xl" },
+                      }}
+                    >
+                      {item.name}
+                    </Text>
 
-                {index < allTeams.length - 1 && <Divider mb="$2" />}
-              </>
-            ))}
-          </VStack>
+                    <Text
+                      fontSize="$md"
+                      fontWeight="normal"
+                      mb="$2"
+                      sx={{
+                        "@md": { display: "flex", fontSize: "$2xl" },
+                      }}
+                    >
+                      0
+                    </Text>
+                  </HStack>
+
+                  {index < allTeams.length - 1 && <Divider mb="$2" />}
+                </Box>
+              ))}
+            </VStack>
+          )}
         </Box>
       </Box>
     </>
