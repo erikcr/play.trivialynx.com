@@ -208,6 +208,7 @@ const Main = () => {
           <VStack>
             <ScrollView
               mb="$6"
+              px="$4"
               horizontal
               showsHorizontalScrollIndicator={false}
             >
@@ -237,18 +238,22 @@ const Main = () => {
               {allRounds.length > 0 &&
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
-                ].map((item, index) => (
-                  <Box h="$56" key={item.id} mb="$4" px="$2">
-                    <Heading pb="$1">Question {index + 1}</Heading>
-                    <Text size="sm" pb="$1" bold>
-                      Points: {item.points}
-                    </Text>
-                    <Text pb="$2">{item.question}</Text>
-                    <Input>
-                      <InputField placeholder="Your answer" />
-                    </Input>
-                  </Box>
-                ))}
+                ].map((item, index) => {
+                  if (item.status !== "PENDING") {
+                    return (
+                      <Box h="$56" key={item.id} mb="$4" px="$2">
+                        <Heading pb="$1">Question {index + 1}</Heading>
+                        <Text size="sm" pb="$1" bold>
+                          Points: {item.points}
+                        </Text>
+                        <Text pb="$2">{item.question}</Text>
+                        <Input>
+                          <InputField placeholder="Your answer" />
+                        </Input>
+                      </Box>
+                    );
+                  }
+                })}
             </ScrollView>
           </VStack>
         )}
