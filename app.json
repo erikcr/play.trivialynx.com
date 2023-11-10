@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "underground-pride",
-    "slug": "underground-pride",
+    "name": "expo-trivia-app",
+    "slug": "expo-trivia-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

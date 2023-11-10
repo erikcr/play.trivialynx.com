@@ -1,6 +1,6 @@
 {
-  "name": "underground-pride",
-  "version": "1.0.0",
+  "name": "expo-trivia-app",
+  "version": "0.0.1",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
