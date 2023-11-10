@@ -161,7 +161,7 @@ const Main = () => {
             "@md": { display: "flex", fontSize: "$2xl" },
           }}
         >
-          Event name
+          {eventData.name}
         </Heading>
 
         <Text
