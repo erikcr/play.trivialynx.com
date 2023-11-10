@@ -131,7 +131,7 @@ const JoinEventForm = () => {
               },
             }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input>
+              <Input isDisabled={code ? true : false}>
                 <InputField
                   fontSize="$sm"
                   placeholder="Join code"
