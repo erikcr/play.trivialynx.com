@@ -98,6 +98,11 @@ const JoinEventForm = () => {
       await AsyncStorage.setItem("teamName", _data.teamName);
       await AsyncStorage.setItem("eventData", JSON.stringify(eventToJoin));
 
+      const insertData = await supabase
+        .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
+        .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
+        .select();
+
       router.push("/play");
     }
   };
