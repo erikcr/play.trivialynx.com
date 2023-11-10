@@ -88,6 +88,24 @@ const Main = () => {
       .subscribe();
   };
 
+  const subscribeTeamUpdates = async (eventId: string) => {
+    supabase
+      .channel("team_updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllTeams(eventId);
+        }
+      )
+      .subscribe();
+  };
+
   const getAllRounds = async (eventId: string) => {
     const { data, error } = await supabase
       .from(process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME)
@@ -123,6 +141,7 @@ const Main = () => {
       getAllRounds(ed.id);
 
       subscribeRoundUpdates(ed.id);
+      subscribeTeamUpdates(ed.id);
     }
   };
 
@@ -261,7 +280,7 @@ const Main = () => {
         {activeTab === "teams" && (
           <VStack mx="$3">
             {allTeams.map((item, index) => (
-              <Box key={item.id}>
+              <Box key={item.id} px="$4">
                 <HStack flex={1} justifyContent="space-between">
                   <Text
                     fontSize="$md"
