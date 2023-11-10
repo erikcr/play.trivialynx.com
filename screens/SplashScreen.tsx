@@ -7,9 +7,9 @@ import {
   Center,
   ButtonText,
 } from "@gluestack-ui/themed";
+import { router, useLocalSearchParams } from "expo-router";
 
 import GuestLayout from "../layouts/GuestLayout";
-import StyledExpoRouterLink from "../components/StyledExpoRouterLink";
 
 import { styled } from "@gluestack-style/react";
 
@@ -56,16 +56,17 @@ function ActionButtons() {
         isDisabled={false}
         isFocusVisible={false}
         backgroundColor="$backgroundLight0"
+        onPress={() => {
+          router.replace("/join");
+        }}
       >
-        <StyledExpoRouterLink href="/join">
-          <ButtonText
-            fontWeight="$bold"
-            textDecorationLine="none"
-            color="$primary500"
-          >
-            JOIN EVENT
-          </ButtonText>
-        </StyledExpoRouterLink>
+        <ButtonText
+          fontWeight="$bold"
+          textDecorationLine="none"
+          color="$primary500"
+        >
+          JOIN EVENT
+        </ButtonText>
       </Button>
     </VStack>
   );
