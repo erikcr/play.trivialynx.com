@@ -70,6 +70,24 @@ const Main = () => {
     }
   };
 
+  const subscribeRoundUpdates = async (eventId: string) => {
+    supabase
+      .channel("round_updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllRounds(eventId);
+        }
+      )
+      .subscribe();
+  };
+
   const getAllRounds = async (eventId: string) => {
     const { data, error } = await supabase
       .from(process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME)
@@ -77,17 +95,19 @@ const Main = () => {
         `
       id,
       name,
+      status,
       ${process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME} (
         id,
         question,
-        points
+        points,
+        status
       )
       `
       )
+      .order("order_num")
       .eq("event_id", eventId);
 
     if (data) {
-      console.log(data);
       setAllRounds(data);
     } else if (error) {
       throw error;
@@ -101,6 +121,8 @@ const Main = () => {
     if (Object.hasOwn(ed, "id")) {
       getAllTeams(ed.id);
       getAllRounds(ed.id);
+
+      subscribeRoundUpdates(ed.id);
     }
   };
 
@@ -195,11 +217,18 @@ const Main = () => {
                   h="$8"
                   mx="$1"
                   variant={activeRoundIndex === index ? "solid" : "outline"}
+                  disabled={item.status === "PENDING"}
+                  borderColor={item.status === "PENDING" ? "$light500" : ""}
                   onPress={() => {
                     setActiveRoundIndex(index);
                   }}
                 >
-                  <ButtonText size="sm">{item.name}</ButtonText>
+                  <ButtonText
+                    size="sm"
+                    color={item.status === "PENDING" ? "$light500" : ""}
+                  >
+                    {item.name}
+                  </ButtonText>
                 </Button>
               ))}
             </ScrollView>
