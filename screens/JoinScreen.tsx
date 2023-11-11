@@ -69,6 +69,8 @@ const JoinEventForm = () => {
   const toast = useToast();
 
   const onSubmit = async (_data: JoinEventSchemaType) => {
+    await AsyncStorage.clear();
+
     const { data, error } = await supabase
       .from(process.env.EXPO_PUBLIC_EVENTS_TABLE_NAME)
       .select()
@@ -95,13 +97,14 @@ const JoinEventForm = () => {
       const eventToJoin = data[0];
 
       await AsyncStorage.setItem("joinCode", _data.joinCode);
-      await AsyncStorage.setItem("teamName", _data.teamName);
       await AsyncStorage.setItem("eventData", JSON.stringify(eventToJoin));
 
-      await supabase
+      const newTeam = await supabase
         .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
         .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
         .select();
+
+      await AsyncStorage.setItem("teamData", JSON.stringify(newTeam.data[0]));
 
       reset();
 
