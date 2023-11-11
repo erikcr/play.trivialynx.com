@@ -19,10 +19,10 @@ import GuestLayout from "../layouts/GuestLayout";
 import { supabase } from "../utils/supabase";
 
 function MobileHeader({
-  teamName,
+  teamData,
   eventData,
 }: {
-  teamName: string;
+  teamData: Object;
   eventData: Object;
 }) {
   return (
@@ -39,7 +39,7 @@ function MobileHeader({
             _dark: { color: "$textDark400" },
           }}
         >
-          {teamName}
+          {teamData.name}
         </Text>
       </VStack>
     </VStack>
@@ -47,7 +47,7 @@ function MobileHeader({
 }
 
 const Main = () => {
-  const [teamName, setTeamName] = useState("");
+  const [teamData, setTeamData] = useState({});
   const [eventData, setEventData] = useState({});
   const [allTeams, setAllTeams] = useState([]);
   const [allRounds, setAllRounds] = useState([]);
@@ -141,9 +141,9 @@ const Main = () => {
       .subscribe();
   };
 
-  const getTeamName = async () => {
-    const tn = (await AsyncStorage.getItem("teamName")) || "";
-    setTeamName(tn);
+  const getTeamData = async () => {
+    const tn = JSON.parse((await AsyncStorage.getItem("teamData")) || "");
+    setTeamData(tn);
   };
 
   const getEventData = async () => {
@@ -157,7 +157,7 @@ const Main = () => {
   };
 
   useEffect(() => {
-    getTeamName();
+    getTeamData();
     getEventData();
 
     subscribeToChanges();
@@ -166,7 +166,7 @@ const Main = () => {
   return (
     <>
       <Box sx={{ "@md": { display: "none" } }}>
-        <MobileHeader teamName={teamName} eventData={eventData} />
+        <MobileHeader teamData={teamData} eventData={eventData} />
       </Box>
 
       <Box
@@ -205,7 +205,7 @@ const Main = () => {
             "@md": { display: "flex", fontSize: "$2xl" },
           }}
         >
-          {teamName}
+          {teamData.name}
         </Text>
 
         <Box>
@@ -270,18 +270,25 @@ const Main = () => {
               {allRounds.length > 0 &&
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
-                ].map((item, index) => {
+                ].map((item) => {
                   if (item.status !== "PENDING") {
                     return (
-                      <Box h="$56" key={item.id} mb="$4" px="$2">
-                        <Heading pb="$1">Question {index + 1}</Heading>
-                        <Text size="sm" pb="$1" bold>
-                          Points: {item.points}
-                        </Text>
+                      <Box
+                        h="$56"
+                        key={item.id}
+                        mb="$4"
+                        px="$2"
+                        borderWidth={1}
+                        borderRadius="$2xl"
+                        justifyContent="center"
+                      >
                         <Text pb="$2">{item.question}</Text>
                         <Input>
                           <InputField placeholder="Your answer" />
                         </Input>
+                        <Text size="sm" pt="$2" bold>
+                          Points: {item.points}
+                        </Text>
                       </Box>
                     );
                   }
