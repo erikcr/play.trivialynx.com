@@ -53,6 +53,7 @@ const Main = () => {
   const [allRounds, setAllRounds] = useState([]);
   const [activeTab, setActiveTab] = useState("rounds");
   const [activeRoundIndex, setActiveRoundIndex] = useState(0);
+  const [activeRoundId, setActiveRoundId] = useState("");
 
   const getAllTeams = async (eventId: string) => {
     const { data, error } = await supabase
@@ -77,14 +78,21 @@ const Main = () => {
         id,
         question,
         points,
-        status
+        status,
+        ${process.env.EXPO_PUBLIC_RESPONSES_TABLE_NAME} (
+          id
+        )
       )
       `
       )
       .order("order_num")
       .eq("event_id", eventId);
-
     if (data) {
+      data.map((item) => {
+        if (item.status === "ONGOING") {
+          setActiveRoundId(item.id);
+        }
+      });
       setAllRounds(data);
     } else if (error) {
       throw error;
@@ -256,7 +264,7 @@ const Main = () => {
               ))}
             </ScrollView>
 
-            <ScrollView px="$4">
+            <Box px="$4">
               {allRounds.length > 0 &&
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
@@ -290,7 +298,7 @@ const Main = () => {
                     </Box>
                   );
                 })}
-            </ScrollView>
+            </Box>
           </VStack>
         )}
 
