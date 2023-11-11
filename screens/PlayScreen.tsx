@@ -123,24 +123,6 @@ const Main = () => {
       .subscribe();
   };
 
-  const subscribeQuestionUpdates = async (roundId: string) => {
-    supabase
-      .channel("question_updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME,
-          filter: `round_id=eq.${roundId}`,
-        },
-        () => {
-          getAllRounds(eventId);
-        }
-      )
-      .subscribe();
-  };
-
   const getTeamData = async () => {
     const tn = JSON.parse((await AsyncStorage.getItem("teamData")) || "");
     setTeamData(tn);
@@ -153,15 +135,23 @@ const Main = () => {
     if (Object.hasOwn(ed, "id")) {
       getAllTeams(ed.id);
       getAllRounds(ed.id);
+
+      subscribeToChanges(ed.id);
     }
   };
 
   useEffect(() => {
     getTeamData();
     getEventData();
-
-    subscribeToChanges();
   }, []);
+
+  const updateResponse = (
+    roundId: string,
+    questionId: string,
+    value: string
+  ) => {
+    AsyncStorage.setItem(`response_${roundId}_${questionId}`, value);
+  };
 
   return (
     <>
@@ -284,7 +274,16 @@ const Main = () => {
                       >
                         <Text pb="$2">{item.question}</Text>
                         <Input>
-                          <InputField placeholder="Your answer" />
+                          <InputField
+                            placeholder="Your answer"
+                            onChange={(e) => {
+                              updateResponse(
+                                allRounds[activeRoundIndex].id,
+                                item.id,
+                                e.target.value
+                              );
+                            }}
+                          />
                         </Input>
                         <Text size="sm" pt="$2" bold>
                           Points: {item.points}
