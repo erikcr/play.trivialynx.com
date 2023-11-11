@@ -261,36 +261,34 @@ const Main = () => {
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
                 ].map((item) => {
-                  if (item.status !== "PENDING") {
-                    return (
-                      <Box
-                        h="$56"
-                        key={item.id}
-                        mb="$4"
-                        px="$2"
-                        borderWidth={1}
-                        borderRadius="$2xl"
-                        justifyContent="center"
-                      >
-                        <Text pb="$2">{item.question}</Text>
-                        <Input>
-                          <InputField
-                            placeholder="Your answer"
-                            onChange={(e) => {
-                              updateResponse(
-                                allRounds[activeRoundIndex].id,
-                                item.id,
-                                e.target.value
-                              );
-                            }}
-                          />
-                        </Input>
-                        <Text size="sm" pt="$2" bold>
-                          Points: {item.points}
-                        </Text>
-                      </Box>
-                    );
-                  }
+                  return (
+                    <Box
+                      h="$56"
+                      key={item.id}
+                      mb="$4"
+                      px="$2"
+                      borderWidth={1}
+                      borderRadius="$2xl"
+                      justifyContent="center"
+                    >
+                      <Text pb="$2">{item.question}</Text>
+                      <Input>
+                        <InputField
+                          placeholder="Your answer"
+                          onChange={(e) => {
+                            updateResponse(
+                              allRounds[activeRoundIndex].id,
+                              item.id,
+                              e.target.value
+                            );
+                          }}
+                        />
+                      </Input>
+                      <Text size="sm" pt="$2" bold>
+                        Points: {item.points}
+                      </Text>
+                    </Box>
+                  );
                 })}
             </ScrollView>
           </VStack>
