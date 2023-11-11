@@ -54,11 +54,6 @@ const Main = () => {
   const [activeTab, setActiveTab] = useState("rounds");
   const [activeRoundIndex, setActiveRoundIndex] = useState(0);
 
-  const getTeamName = async () => {
-    const tn = (await AsyncStorage.getItem("teamName")) || "";
-    setTeamName(tn);
-  };
-
   const getAllTeams = async (eventId: string) => {
     const { data, error } = await supabase
       .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
@@ -68,42 +63,6 @@ const Main = () => {
     if (data) {
       setAllTeams(data);
     }
-  };
-
-  const subscribeRoundUpdates = async (eventId: string) => {
-    supabase
-      .channel("round_updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME,
-          filter: `event_id=eq.${eventId}`,
-        },
-        () => {
-          getAllRounds(eventId);
-        }
-      )
-      .subscribe();
-  };
-
-  const subscribeTeamUpdates = async (eventId: string) => {
-    supabase
-      .channel("team_updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME,
-          filter: `event_id=eq.${eventId}`,
-        },
-        () => {
-          getAllTeams(eventId);
-        }
-      )
-      .subscribe();
   };
 
   const getAllRounds = async (eventId: string) => {
@@ -132,6 +91,61 @@ const Main = () => {
     }
   };
 
+  const subscribeToChanges = async (eventId: string) => {
+    supabase
+      .channel("db-changes")
+      // Listen for Team inserts and updates
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllTeams(eventId);
+        }
+      )
+      // Listen for Round updates
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllRounds(eventId);
+        }
+      )
+      .subscribe();
+  };
+
+  const subscribeQuestionUpdates = async (roundId: string) => {
+    supabase
+      .channel("question_updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME,
+          filter: `round_id=eq.${roundId}`,
+        },
+        () => {
+          getAllRounds(eventId);
+        }
+      )
+      .subscribe();
+  };
+
+  const getTeamName = async () => {
+    const tn = (await AsyncStorage.getItem("teamName")) || "";
+    setTeamName(tn);
+  };
+
   const getEventData = async () => {
     const ed = JSON.parse((await AsyncStorage.getItem("eventData")) || "");
     setEventData(ed);
@@ -139,15 +153,14 @@ const Main = () => {
     if (Object.hasOwn(ed, "id")) {
       getAllTeams(ed.id);
       getAllRounds(ed.id);
-
-      subscribeRoundUpdates(ed.id);
-      subscribeTeamUpdates(ed.id);
     }
   };
 
   useEffect(() => {
     getTeamName();
     getEventData();
+
+    subscribeToChanges();
   }, []);
 
   return (
@@ -253,7 +266,7 @@ const Main = () => {
               ))}
             </ScrollView>
 
-            <ScrollView>
+            <ScrollView px="$4">
               {allRounds.length > 0 &&
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
