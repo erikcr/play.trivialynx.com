@@ -153,12 +153,12 @@ const Main = () => {
     getEventData();
   }, []);
 
-  const updateResponse = (
+  const updateResponse = async (
     roundId: string,
     questionId: string,
     value: string
   ) => {
-    AsyncStorage.setItem(`response_${roundId}_${questionId}`, value);
+    await AsyncStorage.setItem(`response_${roundId}_${questionId}`, value);
   };
 
   return (
@@ -266,6 +266,9 @@ const Main = () => {
 
             <Box px="$4">
               {allRounds.length > 0 &&
+              allRounds[activeRoundIndex][
+                process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
+              ].length > 0 ? (
                 allRounds[activeRoundIndex][
                   process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
                 ].map((item) => {
@@ -297,7 +300,12 @@ const Main = () => {
                       </Text>
                     </Box>
                   );
-                })}
+                })
+              ) : (
+                <Heading display="flex" justifyContent="center">
+                  No questions yet.
+                </Heading>
+              )}
             </Box>
           </VStack>
         )}
