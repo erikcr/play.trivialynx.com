@@ -58,11 +58,6 @@ function RootLayoutNav() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="join" options={{ headerShown: false }} />
         <Stack.Screen name="play" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
-        <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
-        <Stack.Screen name="verify-otp" options={{ headerShown: false }} />
-        <Stack.Screen name="create-password" options={{ headerShown: false }} /> */}
       </Stack>
     </GluestackUIProvider>
   );

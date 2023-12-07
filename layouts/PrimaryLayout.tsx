@@ -4,11 +4,11 @@ import { Box, StatusBar, ScrollView, VStack } from "@gluestack-ui/themed";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type GuestLayoutProps = {
+type PrimaryLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function GuestLayout(props: GuestLayoutProps) {
+export default function PrimaryLayout(props: PrimaryLayoutProps) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -34,8 +34,8 @@ export default function GuestLayout(props: GuestLayoutProps) {
               justifyContent: "center",
             }}
             sx={{
-              "@base": { _light: { bg: "$primary500" } },
-              "@md": { _light: { bg: "$primary900" }, p: "$8" },
+              "@base": { _light: { bg: "$primary700" } },
+              "@md": { _light: { bg: "$primary700" }, p: "$8" },
               _dark: { bg: "$backgroundDark900" },
             }}
             bounces={false}

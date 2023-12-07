@@ -1,5 +1,360 @@
-import PlayScreen from "../screens/PlayScreen";
+import React, { useEffect, useState } from "react";
+import {
+  HStack,
+  Text,
+  VStack,
+  Box,
+  Button,
+  ButtonText,
+  Heading,
+  Divider,
+  Input,
+  InputField,
+  ScrollView,
+} from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Home() {
-  return <PlayScreen />;
+import PrimaryLayout from "../layouts/PrimaryLayout";
+
+import { supabase } from "../utils/supabase";
+import { Tables } from "@/types/database.types";
+
+function MobileHeader({
+  teamData,
+  eventData,
+}: {
+  teamData: Object;
+  eventData: Object;
+}) {
+  return (
+    <VStack px="$3" mt="$4.5" space="md">
+      <VStack space="xs" ml="$1" my="$4">
+        <Heading color="$textLight50" sx={{ _dark: { color: "$textDark50" } }}>
+          {eventData.name}
+        </Heading>
+        <Text
+          fontSize="$md"
+          fontWeight="normal"
+          color="$textLight50"
+          sx={{
+            _dark: { color: "$textDark400" },
+          }}
+        >
+          {teamData.name}
+        </Text>
+      </VStack>
+    </VStack>
+  );
 }
+
+const Main = () => {
+  const [teamData, setTeamData] = useState<Tables<"v001_teams_stag">>();
+  const [eventData, setEventData] = useState<Tables<"v001_events_stag">>();
+  const [allTeams, setAllTeams] = useState<Tables<"v001_teams_stag">[]>([]);
+  const [allRounds, setAllRounds] = useState<Tables<"v001_rounds_stag">[]>([]);
+  const [activeTab, setActiveTab] = useState("rounds");
+  const [activeRoundIndex, setActiveRoundIndex] = useState(0);
+  const [activeRoundId, setActiveRoundId] = useState("");
+
+  const getAllTeams = async (eventId: string) => {
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
+      .select()
+      .eq("event_id", eventId);
+
+    if (data) {
+      setAllTeams(data);
+    }
+  };
+
+  const getAllRounds = async (eventId: string) => {
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME)
+      .select(
+        `
+      id,
+      name,
+      status,
+      ${process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME} (
+        id,
+        question,
+        points,
+        status,
+        ${process.env.EXPO_PUBLIC_RESPONSES_TABLE_NAME} (
+          id
+        )
+      )
+      `
+      )
+      .order("order_num")
+      .eq("event_id", eventId);
+    if (data) {
+      data.map((item) => {
+        if (item.status === "ONGOING") {
+          setActiveRoundId(item.id);
+        }
+      });
+      setAllRounds(data);
+    } else if (error) {
+      throw error;
+    }
+  };
+
+  const subscribeToChanges = async (eventId: string) => {
+    supabase
+      .channel("db-changes")
+      // Listen for Team inserts and updates
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllTeams(eventId);
+        }
+      )
+      // Listen for Round updates
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: process.env.EXPO_PUBLIC_ROUNDS_TABLE_NAME,
+          filter: `event_id=eq.${eventId}`,
+        },
+        () => {
+          getAllRounds(eventId);
+        }
+      )
+      .subscribe();
+  };
+
+  const getTeamData = async () => {
+    const tn = JSON.parse((await AsyncStorage.getItem("teamData")) || "");
+    setTeamData(tn);
+  };
+
+  const getEventData = async () => {
+    const ed = JSON.parse((await AsyncStorage.getItem("eventData")) || "");
+    setEventData(ed);
+
+    if (Object.hasOwn(ed, "id")) {
+      getAllTeams(ed.id);
+      getAllRounds(ed.id);
+
+      subscribeToChanges(ed.id);
+    }
+  };
+
+  useEffect(() => {
+    getTeamData();
+    getEventData();
+  }, []);
+
+  const updateResponse = async (
+    roundId: string,
+    questionId: string,
+    value: string
+  ) => {
+    await AsyncStorage.setItem(`response_${roundId}_${questionId}`, value);
+  };
+
+  return (
+    <>
+      <Box sx={{ "@md": { display: "none" } }}>
+        <MobileHeader teamData={teamData} eventData={eventData} />
+      </Box>
+
+      <Box
+        sx={{
+          "@md": {
+            px: "$8",
+            borderTopLeftRadius: "$none",
+            borderTopRightRadius: "$none",
+            borderBottomRightRadius: "$none",
+          },
+          _dark: { bg: "$backgroundDark800" },
+        }}
+        py="$8"
+        flex={1}
+        bg="$backgroundLight0"
+        justifyContent="flex-start"
+        borderTopLeftRadius="$2xl"
+        borderTopRightRadius="$2xl"
+        borderBottomRightRadius="$none"
+      >
+        <Heading
+          display="none"
+          sx={{
+            "@md": { display: "flex", fontSize: "$2xl" },
+          }}
+        >
+          {eventData.name}
+        </Heading>
+
+        <Text
+          fontSize="$md"
+          fontWeight="normal"
+          display="none"
+          mb="$8"
+          sx={{
+            "@md": { display: "flex", fontSize: "$2xl" },
+          }}
+        >
+          {teamData.name}
+        </Text>
+
+        <Box>
+          <HStack flex={1} justifyContent="space-around">
+            <Heading
+              mb="$4"
+              sx={{
+                "@md": { display: "flex", fontSize: "$2xl" },
+              }}
+              color={activeTab === "rounds" ? "$black" : "$light500"}
+              borderBottomWidth={activeTab === "rounds" ? 1 : 0}
+              onPress={() => setActiveTab("rounds")}
+            >
+              Rounds
+            </Heading>
+
+            <Heading
+              mb="$4"
+              sx={{
+                "@md": { display: "flex", fontSize: "$2xl" },
+              }}
+              color={activeTab === "teams" ? "$black" : "$light500"}
+              borderBottomWidth={activeTab === "teams" ? 1 : 0}
+              onPress={() => setActiveTab("teams")}
+            >
+              Teams
+            </Heading>
+          </HStack>
+        </Box>
+
+        {activeTab === "rounds" && (
+          <VStack>
+            <ScrollView
+              mb="$6"
+              px="$4"
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              {allRounds.map((item, index) => (
+                <Button
+                  key={item.id}
+                  h="$8"
+                  mx="$1"
+                  variant={activeRoundIndex === index ? "solid" : "outline"}
+                  disabled={item.status === "PENDING"}
+                  borderColor={item.status === "PENDING" ? "$light500" : ""}
+                  onPress={() => {
+                    setActiveRoundIndex(index);
+                  }}
+                >
+                  <ButtonText
+                    size="sm"
+                    color={item.status === "PENDING" ? "$light500" : ""}
+                  >
+                    {item.name}
+                  </ButtonText>
+                </Button>
+              ))}
+            </ScrollView>
+
+            <Box px="$4">
+              {allRounds.length > 0 &&
+              allRounds[activeRoundIndex][
+                process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
+              ].length > 0 ? (
+                allRounds[activeRoundIndex][
+                  process.env.EXPO_PUBLIC_QUESTIONS_TABLE_NAME
+                ].map((item) => {
+                  return (
+                    <Box
+                      h="$56"
+                      key={item.id}
+                      mb="$4"
+                      px="$2"
+                      borderWidth={1}
+                      borderRadius="$2xl"
+                      justifyContent="center"
+                    >
+                      <Text pb="$2">{item.question}</Text>
+                      <Input>
+                        <InputField
+                          placeholder="Your answer"
+                          onChange={(e) => {
+                            updateResponse(
+                              allRounds[activeRoundIndex].id,
+                              item.id,
+                              e.target.value
+                            );
+                          }}
+                        />
+                      </Input>
+                      <Text size="sm" pt="$2" bold>
+                        Points: {item.points}
+                      </Text>
+                    </Box>
+                  );
+                })
+              ) : (
+                <Heading display="flex" justifyContent="center">
+                  No questions yet.
+                </Heading>
+              )}
+            </Box>
+          </VStack>
+        )}
+
+        {activeTab === "teams" && (
+          <VStack mx="$3">
+            {allTeams.map((item, index) => (
+              <Box key={item.id} px="$4">
+                <HStack flex={1} justifyContent="space-between">
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    mb="$2"
+                    sx={{
+                      "@md": { display: "flex", fontSize: "$2xl" },
+                    }}
+                  >
+                    0
+                  </Text>
+                </HStack>
+
+                {index < allTeams.length - 1 && <Divider mb="$2" />}
+              </Box>
+            ))}
+          </VStack>
+        )}
+      </Box>
+    </>
+  );
+};
+
+const PlayScreen = () => {
+  return (
+    <PrimaryLayout>
+      <Main />
+    </PrimaryLayout>
+  );
+};
+
+export default PlayScreen;
