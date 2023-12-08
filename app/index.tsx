@@ -1,129 +1,333 @@
 import React from "react";
 import {
-  Box,
-  VStack,
-  Button,
-  Image,
   Center,
+  Button,
+  FormControl,
+  HStack,
+  Input,
+  Text,
+  VStack,
+  useToast,
+  Toast,
+  Box,
+  ToastTitle,
+  ToastDescription,
+  InputField,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlHelper,
   ButtonText,
+  Image,
+  Heading,
 } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Keyboard } from "react-native";
+import { AlertTriangle } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
 import PrimaryLayout from "../layouts/PrimaryLayout";
 
+import { supabase } from "../utils/supabase";
+
 import { styled } from "@gluestack-style/react";
 
 const StyledImage = styled(Image, {
-  "@sm": {
-    props: {
-      style: {
-        height: 40,
-        width: 320,
-      },
-    },
-  },
-  "@md": {
-    props: {
-      style: {
-        height: 141,
-        width: 275,
-      },
+  props: {
+    style: {
+      height: 40,
+      width: 320,
     },
   },
 });
 
-// to render login and sign up buttons
-function ActionButtons() {
-  return (
-    <VStack
-      space="xs"
-      mt="$10"
-      sx={{
-        "@md": {
-          mt: "$12",
+const joinEventSchema = z.object({
+  joinCode: z
+    .string()
+    .min(1, "Join code is required")
+    .regex(new RegExp("^\\d+$"), "Join code must be a number"),
+  teamName: z
+    .string()
+    .min(1, "Team name is required")
+    .min(3, "C'mon you can do better than that"),
+});
+
+type JoinEventSchemaType = z.infer<typeof joinEventSchema>;
+
+const JoinEventForm = () => {
+  const { code } = useLocalSearchParams<{ code?: string }>();
+
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm<JoinEventSchemaType>({
+    resolver: zodResolver(joinEventSchema),
+  });
+
+  const toast = useToast();
+
+  const onSubmit = async (_data: JoinEventSchemaType) => {
+    await AsyncStorage.clear();
+
+    const { data, error } = await supabase
+      .from(process.env.EXPO_PUBLIC_EVENTS_TABLE_NAME)
+      .select()
+      .limit(1)
+      .eq("join_code", _data.joinCode);
+
+    if (!data?.length) {
+      toast.show({
+        placement: "bottom",
+        render: ({ id }) => {
+          return (
+            <Toast nativeID={id} action="error">
+              <VStack space="xs">
+                <ToastTitle>Invalid join code</ToastTitle>
+                <ToastDescription>
+                  Please double check the code you entered.
+                </ToastDescription>
+              </VStack>
+            </Toast>
+          );
         },
+      });
+    } else {
+      const eventToJoin = data[0];
+
+      await AsyncStorage.setItem("joinCode", _data.joinCode);
+
+      const newTeam = await supabase
+        .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
+        .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
+        .select();
+
+      if (newTeam.data) {
+        await AsyncStorage.setItem("myTeam", JSON.stringify(newTeam.data[0]));
+      }
+
+      reset();
+
+      router.replace(`/play?eventId=${eventToJoin.id}`);
+    }
+  };
+
+  const handleKeyPress = () => {
+    Keyboard.dismiss();
+    handleSubmit(onSubmit)();
+  };
+
+  return (
+    <>
+      <VStack justifyContent="space-between">
+        <FormControl isInvalid={!!errors.joinCode} isRequired={true}>
+          <Controller
+            name="joinCode"
+            defaultValue={code ? code : ""}
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await joinEventSchema.parseAsync({ joinCode: value });
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input isDisabled={code ? true : false}>
+                <InputField
+                  fontSize="$sm"
+                  placeholder="Join code"
+                  type="text"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleKeyPress}
+                  returnKeyType="done"
+                />
+              </Input>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorText>
+              {errors?.joinCode?.message}
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl my="$6" isInvalid={!!errors.teamName} isRequired={true}>
+          <Controller
+            name="teamName"
+            defaultValue=""
+            control={control}
+            rules={{
+              validate: async (value) => {
+                try {
+                  await joinEventSchema.parseAsync({
+                    teamName: value,
+                  });
+                  return true;
+                } catch (error: any) {
+                  return error.message;
+                }
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input>
+                <InputField
+                  fontSize="$sm"
+                  placeholder="Team name"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleKeyPress}
+                  returnKeyType="done"
+                />
+              </Input>
+            )}
+          />
+          <FormControlError>
+            <FormControlErrorIcon size="sm" as={AlertTriangle} />
+            <FormControlErrorText>
+              {errors?.teamName?.message}
+            </FormControlErrorText>
+          </FormControlError>
+
+          <FormControlHelper></FormControlHelper>
+        </FormControl>
+      </VStack>
+
+      <Button
+        variant="solid"
+        size="lg"
+        mt="$5"
+        sx={{
+          _light: { bg: "$primary700" },
+          _dark: { bg: "$primary500" },
+        }}
+        onPress={handleSubmit(onSubmit)}
+      >
+        <ButtonText fontSize="$sm">JOIN EVENT</ButtonText>
+      </Button>
+    </>
+  );
+};
+
+function SideContainerWeb() {
+  return (
+    <Center
+      flex={1}
+      bg="$primary600"
+      sx={{
+        _dark: { bg: "$primary600" },
       }}
     >
-      <Button
+      <StyledImage
+        w="$80"
+        h="$10"
+        alt="gluestack-ui Pro"
+        resizeMode="contain"
         sx={{
-          ":hover": {
-            bg: "$backgroundLight100",
+          "@md": {
+            w: "$120",
+            h: "$48",
           },
         }}
-        size="md"
-        variant="solid"
-        action="primary"
-        isDisabled={false}
-        isFocusVisible={false}
-        backgroundColor="$backgroundLight0"
-        onPress={() => {
-          router.replace("/join");
-        }}
-      >
-        <ButtonText
-          fontWeight="$bold"
-          textDecorationLine="none"
-          color="$primary500"
+        source={require("../assets/images/brainybrawls.svg")}
+      />
+    </Center>
+  );
+}
+
+function MobileHeader() {
+  return (
+    <VStack px="$3" mt="$4.5" space="md">
+      <VStack space="xs" ml="$1" my="$4">
+        <Heading color="$textLight50" sx={{ _dark: { color: "$textDark50" } }}>
+          Let's get ready to trivia
+        </Heading>
+        <Text
+          fontSize="$md"
+          fontWeight="normal"
+          color="$primary300"
+          sx={{
+            _dark: { color: "$textDark400" },
+          }}
         >
-          JOIN EVENT
-        </ButtonText>
-      </Button>
+          Enter join code and team name
+        </Text>
+      </VStack>
     </VStack>
   );
 }
 
-function HeaderLogo() {
+const Main = () => {
   return (
-    <Box alignItems="center" justifyContent="center">
-      <StyledImage
-        alt="gluestack-ui Pro"
-        resizeMode="contain"
-        source={require("../assets/images/brainybrawls.svg")}
-        sx={{
-          "@md": {
-            display: "flex",
-          },
-        }}
-        display="none"
-      />
+    <>
+      <Box sx={{ "@md": { display: "none" } }}>
+        <MobileHeader />
+      </Box>
 
-      <StyledImage
+      <Box
+        px="$4"
         sx={{
           "@md": {
-            display: "none",
+            px: "$8",
+            borderTopLeftRadius: "$none",
+            borderTopRightRadius: "$none",
+            borderBottomRightRadius: "$none",
           },
+          _dark: { bg: "$backgroundDark800" },
         }}
-        alt="gluestack-ui Pro"
-        display="flex"
-        source={require("../assets/images/brainybrawls.svg")}
-      />
-    </Box>
+        py="$8"
+        flex={1}
+        bg="$backgroundLight0"
+        justifyContent="space-between"
+        borderTopLeftRadius="$2xl"
+        borderTopRightRadius="$2xl"
+        borderBottomRightRadius="$none"
+      >
+        <Heading
+          display="none"
+          mb="$8"
+          sx={{
+            "@md": { display: "flex", fontSize: "$2xl" },
+          }}
+        >
+          Enter join code and team name
+        </Heading>
+
+        <JoinEventForm />
+
+        <HStack
+          space="xs"
+          alignItems="center"
+          justifyContent="center"
+          mt="auto"
+        ></HStack>
+      </Box>
+    </>
   );
-}
+};
 
-export default function HomeScreen() {
+export default function JoinScreen() {
   return (
     <PrimaryLayout>
-      <Center w="$full" flex={1}>
-        <Box
-          maxWidth="$508"
-          w="$full"
-          minHeight="$544"
-          bg="$primary700"
-          sx={{
-            "@md": {
-              // h: '$authcard',
-              px: "$8",
-              rounded: "$lg",
-            },
-          }}
-          px="$4"
-          justifyContent="center"
-        >
-          <HeaderLogo />
-          <ActionButtons />
-        </Box>
-      </Center>
+      <Box
+        display="none"
+        sx={{ "@md": { display: "flex", bg: "$green400" } }}
+        flex={1}
+      >
+        <SideContainerWeb />
+      </Box>
+      <Main />
     </PrimaryLayout>
   );
 }
