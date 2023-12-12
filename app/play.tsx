@@ -226,10 +226,12 @@ function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
     if (data) {
       setQuestions(data);
 
-      if (!data.filter((item) => item.status === "PENDING").length) {
-        setReadyToSubmit(true);
-      } else {
-        setReadyToSubmit(false);
+      if (activeRound?.status === "ONGOING") {
+        if (!data.filter((item) => item.status === "PENDING").length) {
+          setReadyToSubmit(true);
+        } else {
+          setReadyToSubmit(false);
+        }
       }
     }
   };
