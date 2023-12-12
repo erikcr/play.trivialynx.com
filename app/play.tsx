@@ -138,7 +138,17 @@ export default function PlayScreen() {
       </PrimaryLayout>
 
       {readyToSubmit && (
-        <Fab size="md" placement="bottom right" bgColor="$primary700">
+        <Fab
+          size="md"
+          placement="bottom right"
+          bgColor="$primary700"
+          sx={{
+            "@md": {
+              px: "$8",
+              bgColor: "$backgroundLight800",
+            },
+          }}
+        >
           <FabLabel>Submit</FabLabel>
         </Fab>
       )}
