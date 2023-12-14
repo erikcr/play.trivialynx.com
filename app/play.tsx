@@ -13,6 +13,8 @@ import {
   Input,
   InputField,
   ScrollView,
+  InputIcon,
+  InputSlot,
 } from "@gluestack-ui/themed";
 import {
   router,
@@ -25,6 +27,7 @@ import PrimaryLayout from "../layouts/PrimaryLayout";
 
 import { supabase } from "../utils/supabase";
 import { Tables } from "@/types/database.types";
+import { CheckIcon, XIcon } from "lucide-react-native";
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
@@ -213,6 +216,9 @@ function OngoingEvent({
   const [storedQuestions, setStoredQuestions] = useState({});
   const [activeQuestionResponse, setActiveQuestionResponse] = useState("");
 
+  // Responses
+  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+
   // Display
   const [activeTab, setActiveTab] = useState("rounds");
 
@@ -236,10 +242,22 @@ function OngoingEvent({
     }
   };
 
+  const getResponsees = async () => {
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .select()
+      .order("id")
+      .eq("team_id", myTeam?.id);
+
+    if (data) {
+      setResponses(data);
+    }
+  };
+
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("v001_questions_stag")
-      .select()
+      .select("*, v001_responses_stag (id, submitted_answer, is_correct)")
       .order("id")
       .eq("round_id", activeRound?.id);
 
@@ -253,6 +271,8 @@ function OngoingEvent({
           setReadyToSubmit(false);
         }
       }
+    } else if (error) {
+      console.log(error);
     }
   };
 
@@ -452,10 +472,31 @@ function OngoingEvent({
                     <InputField
                       type="text"
                       placeholder="Your answer"
+                      defaultValue={
+                        item.v001_responses_stag[0]
+                          ? item.v001_responses_stag[0].submitted_answer
+                          : ""
+                      }
                       onFocus={() => setActiveQuestion(item)}
                       onChangeText={saveResponse}
                       // onEndEditing={saveResponse}
                     />
+                    {item.status === "COMPLETE" && (
+                      <InputSlot pr="$3">
+                        <InputIcon
+                          as={
+                            item.v001_responses_stag[0].is_correct
+                              ? CheckIcon
+                              : XIcon
+                          }
+                          color={
+                            item.v001_responses_stag[0].is_correct
+                              ? "$green900"
+                              : "$red900"
+                          }
+                        />
+                      </InputSlot>
+                    )}
                   </Input>
                   <Text size="sm" pt="$2" bold>
                     Points: {item.points}
