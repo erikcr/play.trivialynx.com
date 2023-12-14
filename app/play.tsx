@@ -65,7 +65,6 @@ export default function PlayScreen() {
   useEffect(() => {
     if (rootNavigationState.key) {
       if (!eventId) {
-        console.log("attempting redirect to /");
         router.replace("/");
       } else {
         getMyTeam();
@@ -138,28 +137,12 @@ export default function PlayScreen() {
           {event?.status === "PENDING" && <PendingEvent />}
 
           {event?.status === "ONGOING" && (
-            <OngoingEvent setReadyToSubmit={setReadyToSubmit} />
+            <OngoingEvent myTeam={myTeam} setReadyToSubmit={setReadyToSubmit} />
           )}
 
           {event?.status === "COMPLETE" && <CompleteEvent />}
         </Box>
       </PrimaryLayout>
-
-      {readyToSubmit && (
-        <Fab
-          size="md"
-          placement="bottom right"
-          bgColor="$primary700"
-          sx={{
-            "@md": {
-              px: "$8",
-              bgColor: "$backgroundLight800",
-            },
-          }}
-        >
-          <FabLabel>Submit</FabLabel>
-        </Fab>
-      )}
     </>
   );
 }
@@ -206,7 +189,13 @@ function PendingEvent() {
   );
 }
 
-function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
+function OngoingEvent({
+  myTeam,
+  setReadyToSubmit,
+}: {
+  myTeam: Tables<"v0_teams_stag"> | undefined;
+  setReadyToSubmit: Function;
+}) {
   // Event
   const { eventId } = useLocalSearchParams<{ eventId?: string }>();
 
@@ -219,10 +208,33 @@ function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
 
   // Questions
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [activeQuestion, setActiveQuestion] =
+    useState<Tables<"v001_questions_stag">>();
   const [storedQuestions, setStoredQuestions] = useState({});
+  const [activeQuestionResponse, setActiveQuestionResponse] = useState("");
 
   // Display
   const [activeTab, setActiveTab] = useState("rounds");
+
+  const saveResponse = async (text: string) => {
+    const responseId = `${myTeam?.id}${activeQuestion?.id}`;
+
+    if (activeQuestion && myTeam) {
+      const { data, error } = await supabase
+        .from("v001_responses_stag")
+        .upsert({
+          id: `${myTeam.id}${activeQuestion.id}`,
+          submitted_answer: text,
+          question_id: activeQuestion.id,
+          team_id: myTeam.id,
+        })
+        .select();
+
+      if (error) {
+        console.log(error);
+      }
+    }
+  };
 
   const getQuestions = async () => {
     const { data, error } = await supabase
@@ -303,7 +315,6 @@ function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
 
       supabase
         .channel("question-changes")
-        // Listen for Team inserts and updates
         .on(
           "postgres_changes",
           {
@@ -331,7 +342,6 @@ function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
   useEffect(() => {
     supabase
       .channel("team-changes")
-      // Listen for Team inserts and updates
       .on(
         "postgres_changes",
         {
@@ -439,7 +449,13 @@ function OngoingEvent({ setReadyToSubmit }: { setReadyToSubmit: Function }) {
                 >
                   <Text pb="$2">{item.question}</Text>
                   <Input isDisabled={activeRound?.status === "COMPLETE"}>
-                    <InputField type="text" placeholder="Your answer" />
+                    <InputField
+                      type="text"
+                      placeholder="Your answer"
+                      onFocus={() => setActiveQuestion(item)}
+                      onChangeText={saveResponse}
+                      // onEndEditing={saveResponse}
+                    />
                   </Input>
                   <Text size="sm" pt="$2" bold>
                     Points: {item.points}
