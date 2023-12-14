@@ -14,7 +14,11 @@ import {
   InputField,
   ScrollView,
 } from "@gluestack-ui/themed";
-import { router, useLocalSearchParams } from "expo-router";
+import {
+  router,
+  useLocalSearchParams,
+  useRootNavigationState,
+} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PrimaryLayout from "../layouts/PrimaryLayout";
@@ -23,6 +27,7 @@ import { supabase } from "../utils/supabase";
 import { Tables } from "@/types/database.types";
 
 export default function PlayScreen() {
+  const rootNavigationState = useRootNavigationState();
   const { eventId } = useLocalSearchParams<{ eventId?: string }>();
 
   // Event
@@ -58,28 +63,31 @@ export default function PlayScreen() {
   };
 
   useEffect(() => {
-    if (!eventId) {
-      router.push("/");
-    } else {
-      getMyTeam();
+    if (rootNavigationState.key) {
+      if (!eventId) {
+        console.log("attempting redirect to /");
+        router.replace("/");
+      } else {
+        getMyTeam();
 
-      supabase
-        .channel("event-update")
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "v001_events_stag",
-            filter: `id=eq.${eventId}`,
-          },
-          (payload) => {
-            setEvent(payload.new as Tables<"v001_events_stag">);
-          }
-        )
-        .subscribe();
+        supabase
+          .channel("event-update")
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "v001_events_stag",
+              filter: `id=eq.${eventId}`,
+            },
+            (payload) => {
+              setEvent(payload.new as Tables<"v001_events_stag">);
+            }
+          )
+          .subscribe();
+      }
     }
-  }, []);
+  }, [rootNavigationState, eventId]);
 
   return (
     <>
