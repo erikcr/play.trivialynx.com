@@ -15,6 +15,9 @@ import {
   ScrollView,
   InputIcon,
   InputSlot,
+  Alert,
+  AlertIcon,
+  AlertText,
 } from "@gluestack-ui/themed";
 import {
   router,
@@ -27,7 +30,7 @@ import PrimaryLayout from "../layouts/PrimaryLayout";
 
 import { supabase } from "../utils/supabase";
 import { Tables } from "@/types/database.types";
-import { CheckIcon, XIcon } from "lucide-react-native";
+import { CheckIcon, InfoIcon, XIcon } from "lucide-react-native";
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
@@ -137,15 +140,15 @@ export default function PlayScreen() {
             {myTeam?.name}
           </Text>
 
-          {event?.status === "PENDING" && <PendingEvent />}
-
-          {event?.status === "ONGOING" && (
+          {event?.status === "PENDING" ? (
+            <PendingEvent />
+          ) : (
             <OngoingEvent myTeam={myTeam} setReadyToSubmit={setReadyToSubmit} />
           )}
-
-          {event?.status === "COMPLETE" && <CompleteEvent />}
         </Box>
       </PrimaryLayout>
+
+      {event?.status === "COMPLETE" && <CompleteEvent />}
     </>
   );
 }
@@ -468,7 +471,7 @@ function OngoingEvent({
                   justifyContent="center"
                 >
                   <Text pb="$2">{item.question}</Text>
-                  <Input isDisabled={activeRound?.status === "COMPLETE"}>
+                  <Input isDisabled={item?.status === "COMPLETE"}>
                     <InputField
                       type="text"
                       placeholder="Your answer"
@@ -555,13 +558,10 @@ function OngoingEvent({
 function CompleteEvent() {
   return (
     <>
-      <Heading display="flex" justifyContent="center">
-        Uh oh
-      </Heading>
-
-      <Text display="flex" justifyContent="center">
-        The event has already ended.
-      </Text>
+      <Alert px="$2.5" py="$5" action="info" variant="solid">
+        <AlertIcon as={InfoIcon} mr="$3" />
+        <AlertText>This event has concluded.</AlertText>
+      </Alert>
     </>
   );
 }
