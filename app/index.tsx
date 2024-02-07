@@ -75,7 +75,7 @@ const JoinEventForm = () => {
     await AsyncStorage.clear();
 
     const { data, error } = await supabase
-      .from(process.env.EXPO_PUBLIC_EVENTS_TABLE_NAME)
+      .from("v002_events_stag")
       .select()
       .limit(1)
       .eq("join_code", _data.joinCode);
@@ -102,7 +102,7 @@ const JoinEventForm = () => {
       await AsyncStorage.setItem("joinCode", _data.joinCode);
 
       const newTeam = await supabase
-        .from(process.env.EXPO_PUBLIC_TEAMS_TABLE_NAME)
+        .from("v002_teams_stag")
         .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
         .select();
 
