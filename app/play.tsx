@@ -25,29 +25,30 @@ import {
   useRootNavigationState,
 } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CheckIcon, InfoIcon, XIcon } from "lucide-react-native";
 
 import PrimaryLayout from "../layouts/PrimaryLayout";
 
 import { supabase } from "../utils/supabase";
 import { Tables } from "@/types/database.types";
-import { CheckIcon, InfoIcon, XIcon } from "lucide-react-native";
+import { QuestionsWithResponses } from "@/types/app.types";
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
   const { eventId } = useLocalSearchParams<{ eventId?: string }>();
 
   // Event
-  const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
 
   // Teams
-  const [myTeam, setMyTeam] = useState<Tables<"v001_teams_stag">>();
+  const [myTeam, setMyTeam] = useState<Tables<"v002_teams_stag">>();
 
   // Questions
   const [readyToSubmit, setReadyToSubmit] = useState(false);
 
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .select()
       .eq("id", eventId);
 
@@ -82,11 +83,11 @@ export default function PlayScreen() {
             {
               event: "UPDATE",
               schema: "public",
-              table: "v001_events_stag",
+              table: "v002_events_stag",
               filter: `id=eq.${eventId}`,
             },
             (payload) => {
-              setEvent(payload.new as Tables<"v001_events_stag">);
+              setEvent(payload.new as Tables<"v002_events_stag">);
             }
           )
           .subscribe();
@@ -157,8 +158,8 @@ function MobileHeader({
   myTeam,
   event,
 }: {
-  myTeam: Tables<"v0_teams_stag"> | undefined;
-  event: Tables<"v0_events_stag"> | undefined;
+  myTeam: Tables<"v002_teams_stag"> | undefined;
+  event: Tables<"v002_events_stag"> | undefined;
 }) {
   return (
     <VStack px="$3" mt="$4.5" space="md">
@@ -199,28 +200,28 @@ function OngoingEvent({
   myTeam,
   setReadyToSubmit,
 }: {
-  myTeam: Tables<"v0_teams_stag"> | undefined;
+  myTeam: Tables<"v002_teams_stag"> | undefined;
   setReadyToSubmit: Function;
 }) {
   // Event
   const { eventId } = useLocalSearchParams<{ eventId?: string }>();
 
   // Teams
-  const [teams, setTeams] = useState<Tables<"v001_teams_stag">[]>([]);
+  const [teams, setTeams] = useState<Tables<"v002_teams_stag">[]>([]);
 
   // Rounds
-  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>([]);
-  const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
+  const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>([]);
+  const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
 
   // Questions
-  const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [questions, setQuestions] = useState<QuestionsWithResponses>();
   const [activeQuestion, setActiveQuestion] =
-    useState<Tables<"v001_questions_stag">>();
+    useState<Tables<"v002_questions_stag">>();
   const [storedQuestions, setStoredQuestions] = useState({});
   const [activeQuestionResponse, setActiveQuestionResponse] = useState("");
 
   // Responses
-  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+  const [responses, setResponses] = useState<Tables<"v002_responses_stag">[]>();
 
   // Display
   const [activeTab, setActiveTab] = useState("rounds");
@@ -230,7 +231,7 @@ function OngoingEvent({
 
     if (activeQuestion && myTeam) {
       const { data, error } = await supabase
-        .from("v001_responses_stag")
+        .from("v002_responses_stag")
         .upsert({
           id: `${myTeam.id}${activeQuestion.id}`,
           submitted_answer: text,
@@ -247,7 +248,7 @@ function OngoingEvent({
 
   const getResponsees = async () => {
     const { data, error } = await supabase
-      .from("v001_responses_stag")
+      .from("v002_responses_stag")
       .select()
       .order("id")
       .eq("team_id", myTeam?.id);
@@ -259,8 +260,8 @@ function OngoingEvent({
 
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .select("*, v001_responses_stag (id, submitted_answer, is_correct)")
+      .from("v002_questions_stag")
+      .select("*, v002_responses_stag (id, submitted_answer, is_correct)")
       .order("id")
       .eq("round_id", activeRound?.id);
 
@@ -281,7 +282,7 @@ function OngoingEvent({
 
   const getRounds = async () => {
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .select()
       .order("order_num")
       .eq("event_id", eventId);
@@ -319,7 +320,7 @@ function OngoingEvent({
 
   const getTeams = async () => {
     const { data, error } = await supabase
-      .from("v001_teams_stag")
+      .from("v002_teams_stag")
       .select()
       .eq("event_id", eventId);
 
@@ -343,7 +344,7 @@ function OngoingEvent({
           {
             event: "*",
             schema: "public",
-            table: "v001_questions_stag",
+            table: "v002_questions_stag",
             filter: `round_id=eq.${activeRound?.id}`,
           },
           () => {
@@ -370,7 +371,7 @@ function OngoingEvent({
         {
           event: "*",
           schema: "public",
-          table: "v001_teams_stag",
+          table: "v002_teams_stag",
           filter: `event_id=eq.${eventId}`,
         },
         () => {
@@ -386,7 +387,7 @@ function OngoingEvent({
         {
           event: "UPDATE",
           schema: "public",
-          table: "v001_rounds_stag",
+          table: "v002_rounds_stag",
           filter: `event_id=eq.${eventId}`,
         },
         () => {
@@ -476,8 +477,8 @@ function OngoingEvent({
                       type="text"
                       placeholder="Your answer"
                       defaultValue={
-                        item.v001_responses_stag[0]
-                          ? item.v001_responses_stag[0].submitted_answer
+                        item.v002_responses_stag[0]
+                          ? item.v002_responses_stag[0].submitted_answer
                           : ""
                       }
                       onFocus={() => setActiveQuestion(item)}
@@ -488,12 +489,12 @@ function OngoingEvent({
                       <InputSlot pr="$3">
                         <InputIcon
                           as={
-                            item.v001_responses_stag[0].is_correct
+                            item.v002_responses_stag[0].is_correct
                               ? CheckIcon
                               : XIcon
                           }
                           color={
-                            item.v001_responses_stag[0].is_correct
+                            item.v002_responses_stag[0].is_correct
                               ? "$green900"
                               : "$red900"
                           }
