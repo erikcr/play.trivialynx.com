@@ -82,6 +82,7 @@ export default function PlayScreen() {
       const { data, error } = await supabase
         .from("v002_responses_stag")
         .upsert({
+          id: `${myTeam.id}${activeQuestion.id}`,
           submitted_answer: text,
           question_id: activeQuestion.id,
           team_id: myTeam.id,
@@ -142,12 +143,17 @@ export default function PlayScreen() {
       .order("order_num")
       .eq("event_id", eventId);
     if (data) {
-      data.map((item) => {
-        if (item.status === "ONGOING") {
-          setActiveRound(item);
-        }
-      });
       setRounds(data);
+      
+      const findFirstOngoing = data.find((i) => i.status === "ONGOING");
+      const findFirstPending = data.find((i) => i.status === "PENDING");
+      if (findFirstOngoing) {
+        setActiveRound(findFirstOngoing);
+      } else if (findFirstPending) {
+        setActiveRound(findFirstPending);
+      } else {
+        setActiveRound(data[data.length - 1]);
+      }
     } else if (error) {
       throw error;
     }
@@ -474,13 +480,15 @@ export default function PlayScreen() {
                             <InputField
                               type="text"
                               placeholder="Your answer"
-                              borderWidth={2}
+                              borderWidth={item?.status === "COMPLETE" ? 2 : 0}
                               borderColor={
-                                myTeam?.responses.find(
-                                  (i) => i.question.id === item.id
-                                )?.is_correct
-                                  ? "$green500"
-                                  : "$red500"
+                                item?.status === "COMPLETE"
+                                  ? myTeam?.responses.find(
+                                      (i) => i.question.id === item.id
+                                    )?.is_correct
+                                    ? "$green500"
+                                    : "$red500"
+                                  : ""
                               }
                               defaultValue={
                                 myTeam?.responses.find(
@@ -495,16 +503,19 @@ export default function PlayScreen() {
 
                           <Text size="sm" pt="$2" bold>
                             Points:{" "}
-                            {myTeam?.responses.find(
-                              (i) => i.question.id === item.id
-                            )?.is_correct
-                              ? item.points
-                              : 0}
+                            {item?.status === "COMPLETE"
+                              ? myTeam?.responses.find(
+                                  (i) => i.question.id === item.id
+                                )?.is_correct
+                                ? item.points
+                                : 0
+                              : item.points}
                           </Text>
-
-                          <Text size="sm" pt="$2" bold>
-                            Answer: {item.answer}
-                          </Text>
+                          {item?.status === "COMPLETE" && (
+                            <Text size="sm" pt="$2" bold>
+                              Answer: {item.answer}
+                            </Text>
+                          )}
                         </Box>
                       ))}
 
@@ -523,7 +534,7 @@ export default function PlayScreen() {
               {activeTab === "teams" && (
                 <VStack mx="$3">
                   {teamsSorted?.map((item, index) => (
-                    <Box key={item.id} px="$4">
+                    <Box key={item.id} px="$8">
                       <HStack flex={1} justifyContent="space-between">
                         <Text
                           fontSize="$md"
