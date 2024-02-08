@@ -29,7 +29,12 @@ import PrimaryLayout from "../layouts/PrimaryLayout";
 
 import { supabase } from "../utils/supabase";
 import { Tables } from "@/types/database.types";
-import { QuestionsWithResponses } from "@/types/app.types";
+import {
+  QuestionsWithResponses,
+  TeamsWithResponses,
+  ResponeWithQuestions,
+  TeamWithResponses,
+} from "@/types/app.types";
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
@@ -43,8 +48,9 @@ export default function PlayScreen() {
   const [event, setEvent] = useState<Tables<"v002_events_stag">>();
 
   // Teams
-  const [teams, setTeams] = useState<Tables<"v002_teams_stag">[]>([]);
-  const [myTeam, setMyTeam] = useState<Tables<"v002_teams_stag">>();
+  const [teams, setTeams] = useState<TeamsWithResponses>();
+  const [myTeam, setMyTeam] = useState<TeamWithResponses>();
+  const [teamsSorted, setTeamSorted] = useState();
 
   // Rounds
   const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>([]);
@@ -76,28 +82,17 @@ export default function PlayScreen() {
       const { data, error } = await supabase
         .from("v002_responses_stag")
         .upsert({
-          id: `${myTeam.id}${activeQuestion.id}`,
           submitted_answer: text,
           question_id: activeQuestion.id,
           team_id: myTeam.id,
         })
         .select();
 
+      getMyTeam();
+
       if (error) {
         console.log(error);
       }
-    }
-  };
-
-  const getResponsees = async () => {
-    const { data, error } = await supabase
-      .from("v002_responses_stag")
-      .select()
-      .order("id")
-      .eq("team_id", myTeam?.id);
-
-    if (data) {
-      setResponses(data);
     }
   };
 
@@ -118,7 +113,9 @@ export default function PlayScreen() {
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("v002_questions_stag")
-      .select("*, v002_responses_stag (id, submitted_answer, is_correct)")
+      .select(
+        "*, response: v002_responses_stag (id, submitted_answer, is_correct)"
+      )
       .order("id")
       .eq("round_id", activeRound?.id);
 
@@ -157,10 +154,26 @@ export default function PlayScreen() {
   };
 
   // Team functions
+  const getTeamsScoresSorted = async () => {
+    const { data, error } = await supabase.functions.invoke(
+      "get_teams_scores_sorted",
+      {
+        body: { eventId },
+      }
+    );
+
+    if (data) {
+      setTeamSorted(data);
+    } else if (error) {
+      console.error(error);
+    }
+  };
   const getTeams = async () => {
     const { data, error } = await supabase
       .from("v002_teams_stag")
-      .select()
+      .select(
+        "*, responses: v002_responses_stag ( *, v002_questions_stag ( id, points ) )"
+      )
       .eq("event_id", eventId);
 
     if (data) {
@@ -175,7 +188,18 @@ export default function PlayScreen() {
       router.replace("/");
     } else {
       const team = JSON.parse(storedTeam);
-      setMyTeam(team);
+
+      const { data, error } = await supabase
+        .from("v002_teams_stag")
+        .select(
+          "*, responses: v002_responses_stag ( *, question: v002_questions_stag ( id, points ) )"
+        )
+        .eq("id", team.id);
+
+      if (data) {
+        setMyTeam(data[0]);
+      }
+
       getEvent();
     }
   };
@@ -261,6 +285,7 @@ export default function PlayScreen() {
 
   useEffect(() => {
     getTeams();
+    getTeamsScoresSorted();
   }, []);
 
   useEffect(() => {
@@ -449,34 +474,36 @@ export default function PlayScreen() {
                             <InputField
                               type="text"
                               placeholder="Your answer"
+                              borderWidth={2}
+                              borderColor={
+                                myTeam?.responses.find(
+                                  (i) => i.question.id === item.id
+                                )?.is_correct
+                                  ? "$green500"
+                                  : "$red500"
+                              }
                               defaultValue={
-                                item.v002_responses_stag[0]
-                                  ? item.v002_responses_stag[0].submitted_answer
-                                  : ""
+                                myTeam?.responses.find(
+                                  (i) => i.question.id === item.id
+                                )?.submitted_answer || ""
                               }
                               onFocus={() => setActiveQuestion(item)}
                               onChangeText={saveResponse}
                               // onEndEditing={saveResponse}
                             />
-                            {item.status === "COMPLETE" && (
-                              <InputSlot pr="$3">
-                                <InputIcon
-                                  as={
-                                    item.v002_responses_stag[0].is_correct
-                                      ? CheckIcon
-                                      : XIcon
-                                  }
-                                  color={
-                                    item.v002_responses_stag[0].is_correct
-                                      ? "$green900"
-                                      : "$red900"
-                                  }
-                                />
-                              </InputSlot>
-                            )}
                           </Input>
+
                           <Text size="sm" pt="$2" bold>
-                            Points: {item.points}
+                            Points:{" "}
+                            {myTeam?.responses.find(
+                              (i) => i.question.id === item.id
+                            )?.is_correct
+                              ? item.points
+                              : 0}
+                          </Text>
+
+                          <Text size="sm" pt="$2" bold>
+                            Answer: {item.answer}
                           </Text>
                         </Box>
                       ))}
@@ -495,7 +522,7 @@ export default function PlayScreen() {
 
               {activeTab === "teams" && (
                 <VStack mx="$3">
-                  {teams.map((item, index) => (
+                  {teamsSorted?.map((item, index) => (
                     <Box key={item.id} px="$4">
                       <HStack flex={1} justifyContent="space-between">
                         <Text
@@ -517,11 +544,13 @@ export default function PlayScreen() {
                             "@md": { display: "flex", fontSize: "$2xl" },
                           }}
                         >
-                          0
+                          {item.team_total_points}
                         </Text>
                       </HStack>
 
-                      {index < teams.length - 1 && <Divider mb="$2" />}
+                      {teams && index < teams?.length - 1 && (
+                        <Divider mb="$2" />
+                      )}
                     </Box>
                   ))}
                 </VStack>
