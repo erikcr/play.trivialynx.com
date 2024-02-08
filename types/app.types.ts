@@ -4,7 +4,7 @@ import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
 const questionsWithResponsesQuery = supabase
   .from("v002_questions_stag")
-  .select(`*, v002_responses_stag ( id, is_correct )`);
+  .select(`*, response: v002_responses_stag ( id, is_correct )`);
 export type QuestionsWithResponses = QueryData<typeof questionsWithResponsesQuery>;
 
 const teamsWithResponsesQuery = supabase
@@ -12,11 +12,12 @@ const teamsWithResponsesQuery = supabase
   .select(`
     id,
     name,
-    v002_responses_stag (
+    responses: v002_responses_stag (
       id,
       is_correct,
       submitted_answer,
-      v002_questions_stag (
+      question: v002_questions_stag (
+        id,
         points
       )
     )
@@ -28,11 +29,12 @@ const teamWithResponsesQuery = supabase
   .select(`
     id,
     name,
-    v002_responses_stag (
+    responses: v002_responses_stag (
       id,
       is_correct,
       submitted_answer,
-      v002_questions_stag (
+      question: v002_questions_stag (
+        id,
         points
       )
     )
