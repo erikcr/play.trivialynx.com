@@ -20,6 +20,7 @@ import {
   ButtonText,
   Image,
   Heading,
+  Divider,
 } from "@gluestack-ui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useForm, Controller } from "react-hook-form";
@@ -38,8 +39,17 @@ import { styled } from "@gluestack-style/react";
 const StyledImage = styled(Image, {
   props: {
     style: {
-      height: 40,
-      width: 320,
+      height: 280,
+      width: 280,
+    },
+  },
+});
+
+const MobileStyledImage = styled(Image, {
+  props: {
+    style: {
+      height: 56,
+      width: 56,
     },
   },
 });
@@ -55,7 +65,15 @@ const joinEventSchema = z.object({
     .min(3, "C'mon you can do better than that"),
 });
 
+const emailSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "This field has to be filled." })
+    .email("This is not a valid email."),
+});
+
 type JoinEventSchemaType = z.infer<typeof joinEventSchema>;
+type EmailSchemaType = z.infer<typeof emailSchema>;
 
 const JoinEventForm = () => {
   const { code } = useLocalSearchParams<{ code?: string }>();
@@ -220,6 +238,91 @@ const JoinEventForm = () => {
   );
 };
 
+function EmailForm() {
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    reset,
+  } = useForm<EmailSchemaType>({
+    resolver: zodResolver(emailSchema),
+  });
+
+  const onSubmit = async (_data: EmailSchemaType) => {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: _data.email,
+      options: {
+        // set this to false if you do not want the user to be automatically signed up
+        shouldCreateUser: false,
+        emailRedirectTo: "https://trivitlynx.tech",
+      },
+    });
+
+    console.log(data);
+  };
+
+  const handleKeyPress = () => {
+    Keyboard.dismiss();
+    handleSubmit(onSubmit)();
+  };
+
+  return (
+    <>
+      <Divider mt="$12" mb="$12" />
+
+      <Text>Enter your email to start creating your own</Text>
+
+      <FormControl mt="$6" isInvalid={!!errors.email} isRequired={true}>
+        <Controller
+          name="email"
+          control={control}
+          rules={{
+            validate: async (value) => {
+              try {
+                await emailSchema.parseAsync({ email: value });
+                return true;
+              } catch (error: any) {
+                return error.message;
+              }
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input>
+              <InputField
+                fontSize="$sm"
+                placeholder="Email"
+                type="text"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                onSubmitEditing={handleKeyPress}
+                returnKeyType="done"
+              />
+            </Input>
+          )}
+        />
+        <FormControlError>
+          <FormControlErrorIcon size="md" as={AlertTriangle} />
+          <FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
+        </FormControlError>
+      </FormControl>
+
+      <Button
+        variant="solid"
+        size="lg"
+        mt="$5"
+        sx={{
+          _light: { bg: "$primary700" },
+          _dark: { bg: "$primary500" },
+        }}
+        onPress={handleSubmit(onSubmit)}
+      >
+        <ButtonText fontSize="$sm">CREATE YOUR OWN</ButtonText>
+      </Button>
+    </>
+  );
+}
+
 function SideContainerWeb() {
   return (
     <Center
@@ -231,16 +334,15 @@ function SideContainerWeb() {
     >
       <StyledImage
         w="$80"
-        h="$10"
+        h="$80"
         alt="gluestack-ui Pro"
         resizeMode="contain"
         sx={{
           "@md": {
-            w: "$120",
-            h: "$48",
+            display: "hidden",
           },
         }}
-        source={require("../assets/images/brainybrawls.svg")}
+        source={require("../assets/images/trivialynx-logo.svg")}
       />
     </Center>
   );
@@ -250,19 +352,37 @@ function MobileHeader() {
   return (
     <VStack px="$3" mt="$4.5" space="md">
       <VStack space="xs" ml="$1" my="$4">
-        <Heading color="$textLight50" sx={{ _dark: { color: "$textDark50" } }}>
-          Let's get ready to trivia
-        </Heading>
-        <Text
-          fontSize="$md"
-          fontWeight="normal"
-          color="$primary300"
-          sx={{
-            _dark: { color: "$textDark400" },
-          }}
-        >
-          Enter join code and team name
-        </Text>
+        <HStack>
+          <MobileStyledImage
+            alt="gluestack-ui Pro"
+            resizeMode="contain"
+            sx={{
+              "@md": {
+                w: "$120",
+                h: "$80",
+              },
+            }}
+            source={require("../assets/images/trivialynx-logo.svg")}
+          />
+          <VStack ml="$4">
+            <Heading
+              color="$textLight50"
+              sx={{ _dark: { color: "$textDark50" } }}
+            >
+              Let's get ready to trivia
+            </Heading>
+            <Text
+              fontSize="$md"
+              fontWeight="normal"
+              color="$primary300"
+              sx={{
+                _dark: { color: "$textDark400" },
+              }}
+            >
+              Enter join code and team name
+            </Text>
+          </VStack>
+        </HStack>
       </VStack>
     </VStack>
   );
@@ -305,6 +425,8 @@ const Main = () => {
         </Heading>
 
         <JoinEventForm />
+
+        <EmailForm />
 
         <HStack
           space="xs"
