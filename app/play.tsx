@@ -16,6 +16,8 @@ import {
   Alert,
   AlertIcon,
   AlertText,
+  Image,
+  LinearGradient,
 } from "@gluestack-ui/themed";
 import {
   router,
@@ -24,6 +26,7 @@ import {
 } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckIcon, InfoIcon, XIcon } from "lucide-react-native";
+import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient";
 
 import PrimaryLayout from "../layouts/PrimaryLayout";
 
@@ -35,6 +38,17 @@ import {
   ResponeWithQuestions,
   TeamWithResponses,
 } from "@/types/app.types";
+
+import { styled } from "@gluestack-style/react";
+
+const MobileStyledImage = styled(Image, {
+  props: {
+    style: {
+      height: 56,
+      width: 56,
+    },
+  },
+});
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
@@ -144,7 +158,7 @@ export default function PlayScreen() {
       .eq("event_id", eventId);
     if (data) {
       setRounds(data);
-      
+
       const findFirstOngoing = data.find((i) => i.status === "ONGOING");
       const findFirstPending = data.find((i) => i.status === "PENDING");
       if (findFirstOngoing) {
@@ -323,25 +337,40 @@ export default function PlayScreen() {
   return (
     <>
       <PrimaryLayout>
-        <Box sx={{ "@md": { display: "none" } }}>
-          <VStack px="$3" mt="$4.5" space="md">
+        <Box position="absolute" sx={{ "@md": { display: "none" } }}>
+          <VStack px="$3" space="md">
             <VStack space="xs" ml="$1" my="$4">
-              <Heading
-                color="$textLight50"
-                sx={{ _dark: { color: "$textDark50" } }}
-              >
-                {event?.name}
-              </Heading>
-              <Text
-                fontSize="$md"
-                fontWeight="normal"
-                color="$textLight50"
-                sx={{
-                  _dark: { color: "$textDark400" },
-                }}
-              >
-                {myTeam?.name}
-              </Text>
+              <HStack>
+                <MobileStyledImage
+                  alt="gluestack-ui Pro"
+                  resizeMode="contain"
+                  sx={{
+                    "@md": {
+                      w: "$120",
+                      h: "$80",
+                    },
+                  }}
+                  source={require("../assets/images/trivialynx-logo.svg")}
+                />
+                <VStack ml="$4">
+                  <Heading
+                    color="$textLight50"
+                    sx={{ _dark: { color: "$textDark50" } }}
+                  >
+                    {event?.name}
+                  </Heading>
+                  <Text
+                    fontSize="$md"
+                    fontWeight="normal"
+                    color="$textLight50"
+                    sx={{
+                      _dark: { color: "$textDark400" },
+                    }}
+                  >
+                    {myTeam?.name}
+                  </Text>
+                </VStack>
+              </HStack>
             </VStack>
           </VStack>
         </Box>
@@ -356,9 +385,14 @@ export default function PlayScreen() {
             },
             _dark: { bg: "$backgroundDark800" },
           }}
-          py="$8"
+          mt="$2"
           flex={1}
-          bg="$backgroundLight0"
+          position="absolute"
+          top="$20"
+          left="$0"
+          right="$0"
+          bottom="$0"
+          bg="$backgroundDark100"
           justifyContent="flex-start"
           borderTopLeftRadius="$2xl"
           borderTopRightRadius="$2xl"
@@ -398,9 +432,8 @@ export default function PlayScreen() {
           ) : (
             <>
               <Box>
-                <HStack flex={1} justifyContent="space-around">
+                <HStack pt="$4" mb="$2" flex={1} justifyContent="space-around">
                   <Heading
-                    mb="$4"
                     sx={{
                       "@md": { display: "flex", fontSize: "$2xl" },
                     }}
@@ -412,7 +445,6 @@ export default function PlayScreen() {
                   </Heading>
 
                   <Heading
-                    mb="$4"
                     sx={{
                       "@md": { display: "flex", fontSize: "$2xl" },
                     }}
@@ -426,9 +458,10 @@ export default function PlayScreen() {
               </Box>
 
               {activeTab === "rounds" && (
-                <VStack>
+                <ScrollView pb="$8">
                   <ScrollView
-                    mb="$6"
+                    mt="$3"
+                    mb="$5"
                     px="$4"
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -528,7 +561,7 @@ export default function PlayScreen() {
                       </Heading>
                     )}
                   </Box>
-                </VStack>
+                </ScrollView>
               )}
 
               {activeTab === "teams" && (
@@ -571,12 +604,12 @@ export default function PlayScreen() {
         </Box>
       </PrimaryLayout>
 
-      {event?.status === "COMPLETE" && (
+      {/* {event?.status === "COMPLETE" && (
         <Alert px="$2.5" py="$5" action="info" variant="solid">
           <AlertIcon as={InfoIcon} mr="$3" />
           <AlertText>This event has concluded.</AlertText>
         </Alert>
-      )}
+      )} */}
     </>
   );
 }
