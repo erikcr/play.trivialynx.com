@@ -54,3 +54,10 @@ const responseWithQuestionsQuery = supabase
   `)
   .limit(1);
 export type ResponeWithQuestions = QueryData<typeof responseWithQuestionsQuery>;
+
+export type TeamScoresSorted = {
+  id: string,
+  name: string,
+  team_total_points: number,
+  responses: Tables<"v002_responses_stag">[]
+}

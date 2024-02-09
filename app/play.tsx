@@ -35,7 +35,7 @@ import { Tables } from "@/types/database.types";
 import {
   QuestionsWithResponses,
   TeamsWithResponses,
-  ResponeWithQuestions,
+  TeamScoresSorted,
   TeamWithResponses,
 } from "@/types/app.types";
 
@@ -64,7 +64,7 @@ export default function PlayScreen() {
   // Teams
   const [teams, setTeams] = useState<TeamsWithResponses>();
   const [myTeam, setMyTeam] = useState<TeamWithResponses>();
-  const [teamsSorted, setTeamSorted] = useState();
+  const [teamsSorted, setTeamSorted] = useState<TeamScoresSorted[]>();
 
   // Rounds
   const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>([]);
@@ -159,15 +159,15 @@ export default function PlayScreen() {
     if (data) {
       setRounds(data);
 
-      const findFirstOngoing = data.find((i) => i.status === "ONGOING");
-      const findFirstPending = data.find((i) => i.status === "PENDING");
-      if (findFirstOngoing) {
-        setActiveRound(findFirstOngoing);
-      } else if (findFirstPending) {
-        setActiveRound(findFirstPending);
-      } else {
-        setActiveRound(data[data.length - 1]);
-      }
+      // const findFirstOngoing = data.find((i) => i.status === "ONGOING");
+      // const findFirstPending = data.find((i) => i.status === "PENDING");
+      // if (findFirstOngoing) {
+      //   setActiveRound(findFirstOngoing);
+      // } else if (findFirstPending) {
+      //   setActiveRound(findFirstPending);
+      // } else {
+      //   setActiveRound(data[data.length - 1]);
+      // }
     } else if (error) {
       throw error;
     }
@@ -188,6 +188,7 @@ export default function PlayScreen() {
       console.error(error);
     }
   };
+
   const getTeams = async () => {
     const { data, error } = await supabase
       .from("v002_teams_stag")
@@ -420,7 +421,7 @@ export default function PlayScreen() {
           </Text>
 
           {event?.status === "PENDING" ? (
-            <>
+            <Box mt="$10">
               <Heading display="flex" justifyContent="center">
                 Hang tight
               </Heading>
@@ -428,7 +429,7 @@ export default function PlayScreen() {
               <Text display="flex" justifyContent="center">
                 The organizer will start the event soon.
               </Text>
-            </>
+            </Box>
           ) : (
             <>
               <Box>
@@ -565,7 +566,7 @@ export default function PlayScreen() {
               )}
 
               {activeTab === "teams" && (
-                <VStack mx="$3">
+                <VStack mx="$3" mt="$3">
                   {teamsSorted?.map((item, index) => (
                     <Box key={item.id} px="$8">
                       <HStack flex={1} justifyContent="space-between">
@@ -573,6 +574,7 @@ export default function PlayScreen() {
                           fontSize="$md"
                           fontWeight="normal"
                           mb="$2"
+                          mr="$10"
                           sx={{
                             "@md": { display: "flex", fontSize: "$2xl" },
                           }}
