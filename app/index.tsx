@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Center,
   Button,
@@ -118,6 +118,7 @@ const JoinEventForm = () => {
       const eventToJoin = data[0];
 
       await AsyncStorage.setItem("joinCode", _data.joinCode);
+      await AsyncStorage.setItem("joinDate", JSON.stringify(Date.now()));
 
       const newTeam = await supabase
         .from("v002_teams_stag")
@@ -138,6 +139,24 @@ const JoinEventForm = () => {
     Keyboard.dismiss();
     handleSubmit(onSubmit)();
   };
+
+  const checkJoinDate = async () => {
+    const joinCode = await AsyncStorage.getItem("joinCode");
+    const joinDateStr = await AsyncStorage.getItem("joinDate");
+
+    if (joinDateStr) {
+      const joinDate = JSON.parse(joinDateStr);
+      const fourHours = 4 * 60 * 60 *1000;
+
+      if (Date.now() - joinDate < fourHours) {
+        router.replace(`/play?eventId=${joinCode}`);
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkJoinDate();
+  }, []);
 
   return (
     <>
@@ -426,7 +445,7 @@ const Main = () => {
 
         <JoinEventForm />
 
-        <EmailForm />
+        {/* <EmailForm /> */}
 
         <HStack
           space="xs"
