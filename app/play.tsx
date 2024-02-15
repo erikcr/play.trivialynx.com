@@ -75,7 +75,6 @@ export default function PlayScreen() {
   const [questions, setQuestions] = useState<QuestionsWithResponses>();
   const [activeQuestion, setActiveQuestion] =
     useState<Tables<"v002_questions_stag">>();
-  const [storedQuestions, setStoredQuestions] = useState({});
   const [activeQuestionResponse, setActiveQuestionResponse] = useState("");
 
   // Responses
@@ -109,19 +108,6 @@ export default function PlayScreen() {
         console.log(error);
       }
     }
-  };
-
-  const getStoredAnswers = async () => {
-    const keys = await AsyncStorage.getAllKeys();
-    keys.map(async (item) => {
-      if (item.includes("response_")) {
-        const val = await AsyncStorage.getItem(item);
-        setStoredQuestions({
-          ...storedQuestions,
-          [item]: val,
-        });
-      }
-    });
   };
 
   // Questions functions
@@ -159,15 +145,15 @@ export default function PlayScreen() {
     if (data) {
       setRounds(data);
 
-      // const findFirstOngoing = data.find((i) => i.status === "ONGOING");
-      // const findFirstPending = data.find((i) => i.status === "PENDING");
-      // if (findFirstOngoing) {
-      //   setActiveRound(findFirstOngoing);
-      // } else if (findFirstPending) {
-      //   setActiveRound(findFirstPending);
-      // } else {
-      //   setActiveRound(data[data.length - 1]);
-      // }
+      const findFirstOngoing = data.find((i) => i.status === "ONGOING");
+      const findFirstPending = data.find((i) => i.status === "PENDING");
+      if (findFirstOngoing) {
+        setActiveRound(findFirstOngoing);
+      } else if (findFirstPending) {
+        setActiveRound(findFirstPending);
+      } else {
+        setActiveRound(data[data.length - 1]);
+      }
     } else if (error) {
       throw error;
     }
@@ -186,19 +172,6 @@ export default function PlayScreen() {
       setTeamSorted(data);
     } else if (error) {
       console.error(error);
-    }
-  };
-
-  const getTeams = async () => {
-    const { data, error } = await supabase
-      .from("v002_teams_stag")
-      .select(
-        "*, responses: v002_responses_stag ( *, v002_questions_stag ( id, points ) )"
-      )
-      .eq("event_id", eventId);
-
-    if (data) {
-      setTeams(data);
     }
   };
 
@@ -240,24 +213,6 @@ export default function PlayScreen() {
   // Subscriptions
   useEffect(() => {
     supabase
-      .channel("team-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "v002_teams_stag",
-          filter: `event_id=eq.${eventId}`,
-        },
-        () => {
-          getTeams();
-        }
-      )
-      .subscribe();
-  }, []);
-
-  useEffect(() => {
-    supabase
       .channel("round-changes")
       .on(
         "postgres_changes",
@@ -297,15 +252,10 @@ export default function PlayScreen() {
   }, [activeRound]);
 
   useEffect(() => {
-    getStoredAnswers();
-  }, []);
-
-  useEffect(() => {
     getRounds();
   }, []);
 
   useEffect(() => {
-    getTeams();
     getTeamsScoresSorted();
   }, []);
 
