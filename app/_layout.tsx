@@ -1,4 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import "@/global.css";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import {
   DarkTheme,
   DefaultTheme,
@@ -10,7 +12,6 @@ import { useEffect } from "react";
 import { useColorScheme } from "react-native";
 
 import { config } from "../gluestack-ui.config";
-import { GluestackUIProvider } from "@gluestack-ui/themed";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,7 +54,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <GluestackUIProvider config={config}>
+    <GluestackUIProvider mode="light">
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="play" options={{ headerShown: false }} />
