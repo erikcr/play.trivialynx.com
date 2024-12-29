@@ -7,9 +7,15 @@
     "android": "npx expo start --android",
     "ios": "npx expo start --ios",
     "web": "npx expo start --web",
-    "build": "npx expo export -p web"
+    "build": "npx expo export -p web",
+    "biome:check": "biome check components/ app/ lib/",
+    "biome:check-fix": "npx @biomejs/biome check --fix components/ app/ lib/",
+    "biome:format": "npx @biomejs/biome format --write components/ app/ lib/",
+    "biome:lint": "npx @biomejs/biome lint components/ app/ lib/",
+    "supabase:generate-types": "supabase gen types typescript --project-id qvcjcgpprwheudoucony --schema public > lib/types/database.types.ts"
   },
   "dependencies": {
+    "@expo/html-elements": "^0.11.0",
     "@expo/webpack-config": "^19.0.1",
     "@gluestack-ui/accordion": "^1.0.6",
     "@gluestack-ui/actionsheet": "^0.2.44",
@@ -76,6 +82,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@biomejs/biome": "1.9.4",
     "@types/react": "~18.2.79",
     "@unitools/babel-plugin-universal-image": "^1.0.0",
     "autoprefixer": "^10.4.20",

@@ -1,67 +1,52 @@
-import React, { useEffect } from "react";
-import { VStack } from "@/components/ui/vstack";
-import { ScrollView } from "@/components/ui/scroll-view";
-import { Heading } from "@/components/ui/heading";
-import { StatusBar } from "@/components/ui/status-bar";
 import { Box } from "@/components/ui/box";
-import { SafeAreaView } from "@/components/ui/safe-area-view";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
-import {
-  useToast,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-} from "@/components/ui/toast";
-import { z } from "zod";
-import { router, useLocalSearchParams } from "expo-router";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Center } from "@/components/ui/center";
 import {
   FormControl,
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
-  FormControlHelper,
 } from "@/components/ui/form-control";
-import { useForm, Controller } from "react-hook-form";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Input, InputField } from "@/components/ui/input";
+import { SafeAreaView } from "@/components/ui/safe-area-view";
+import { ScrollView } from "@/components/ui/scroll-view";
+import { StatusBar } from "@/components/ui/status-bar";
+import { Text } from "@/components/ui/text";
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from "@/components/ui/toast";
+import { VStack } from "@/components/ui/vstack";
+import { supabase } from "@/lib/supabase";
+import type { Tables } from "@/lib/types/database.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { supabase } from "../utils/supabase";
-import { Keyboard } from "react-native";
-import { Input, InputField } from "@/components/ui/input";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Center } from "@/components/ui/center";
+import { router, useLocalSearchParams } from "expo-router";
 import { TriangleAlert } from "lucide-react-native";
+import type React from "react";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Keyboard } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useWindowDimensions } from "react-native";
+import { z } from "zod";
 
-// const MobileStyledImage = styled(Image, {
-//   props: {
-//     style: {
-//       height: 56,
-//       width: 56,
-//     },
-//   },
-// });
+type Event = Tables<"event">;
+type Team = Tables<"team">;
 
 const joinEventSchema = z.object({
-  joinCode: z
-    .string()
-    .min(1, "Join code is required")
-    .regex(new RegExp("^\\d+$"), "Join code must be a number"),
+  joinCode: z.string().min(1, "Join code is required"),
   teamName: z
     .string()
     .min(1, "Team name is required")
     .min(3, "C'mon you can do better than that"),
 });
 
-const emailSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: "This field has to be filled." })
-    .email("This is not a valid email."),
-});
-
 type JoinEventSchemaType = z.infer<typeof joinEventSchema>;
-type EmailSchemaType = z.infer<typeof emailSchema>;
 
 const JoinEventForm = () => {
   const { code } = useLocalSearchParams<{ code?: string }>();
@@ -81,12 +66,17 @@ const JoinEventForm = () => {
     await AsyncStorage.clear();
 
     const { data, error } = await supabase
-      .from("v002_events_stag")
+      .from("event")
       .select()
       .limit(1)
-      .eq("join_code", _data.joinCode);
+      .eq("join_code", _data.joinCode)
+      .single();
 
-    if (!data?.length) {
+    if (error) {
+      console.error(error);
+    }
+
+    if (!data) {
       toast.show({
         placement: "bottom",
         render: ({ id }) => {
@@ -103,18 +93,19 @@ const JoinEventForm = () => {
         },
       });
     } else {
-      const eventToJoin = data[0];
+      const eventToJoin = data as Event;
 
-      await AsyncStorage.setItem("joinCode", _data.joinCode);
+      await AsyncStorage.setItem("eventId", eventToJoin.id);
       await AsyncStorage.setItem("joinDate", JSON.stringify(Date.now()));
 
-      const newTeam = await supabase
-        .from("v002_teams_stag")
+      const { data: newTeam } = await supabase
+        .from("team")
         .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
-        .select();
+        .select()
+        .single();
 
-      if (newTeam.data) {
-        await AsyncStorage.setItem("myTeam", JSON.stringify(newTeam.data[0]));
+      if (newTeam) {
+        await AsyncStorage.setItem("myTeam", JSON.stringify(newTeam as Team));
       }
 
       reset();
@@ -184,14 +175,18 @@ const JoinEventForm = () => {
                     onBlur={onBlur}
                     onSubmitEditing={handleKeyPress}
                     returnKeyType="done"
-                    className="text-base"
+                    className="text-base placeholder:text-muted-foreground"
                   />
                 </Input>
               )}
             />
             <FormControlError>
-              <FormControlErrorIcon size="sm" as={TriangleAlert} />
-              <FormControlErrorText>
+              <FormControlErrorIcon
+                size="xs"
+                as={TriangleAlert}
+                className="text-red-400"
+              />
+              <FormControlErrorText size="sm" className="text-red-400">
                 {errors?.joinCode?.message}
               </FormControlErrorText>
             </FormControlError>
@@ -222,7 +217,7 @@ const JoinEventForm = () => {
                 <Input
                   size="lg"
                   variant="outline"
-                  className="bg-white dark:bg-gray-800"
+                  className=" dark:bg-gray-800"
                 >
                   <InputField
                     placeholder="Enter team name"
@@ -231,14 +226,18 @@ const JoinEventForm = () => {
                     onBlur={onBlur}
                     onSubmitEditing={handleKeyPress}
                     returnKeyType="done"
-                    className="text-base"
+                    className="text-base placeholder:text-muted-foreground"
                   />
                 </Input>
               )}
             />
             <FormControlError>
-              <FormControlErrorIcon size="sm" as={TriangleAlert} />
-              <FormControlErrorText>
+              <FormControlErrorIcon
+                size="xs"
+                as={TriangleAlert}
+                className="text-red-400"
+              />
+              <FormControlErrorText size="sm" className="text-red-400">
                 {errors?.teamName?.message}
               </FormControlErrorText>
             </FormControlError>
@@ -249,30 +248,34 @@ const JoinEventForm = () => {
           variant="solid"
           size="lg"
           onPress={handleSubmit(onSubmit)}
-          className="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500"
+          className="w-full bg-primary hover:bg-primary/90 active:bg-primary/80 dark:bg-primary"
         >
-          <ButtonText className="text-base font-medium">Join Event</ButtonText>
+          <ButtonText className="text-base font-medium text-primary-foreground">
+            Join Event
+          </ButtonText>
         </Button>
       </VStack>
     </Box>
   );
 };
 
-function SideContainerWeb() {
+function DesktopMessage() {
   return (
-    <Center className="flex-1 bg-primary-600 dark:bg-primary-600 md:rounded-l-2xl">
-      {/* <StyledImage
-        w="$80"
-        h="$80"
-        alt="gluestack-ui Pro"
-        resizeMode="contain"
-        sx={{
-          "@md": {
-            display: "hidden",
-          },
-        }}
-        source={require("../assets/images/trivialynx-logo.svg")}
-      /> */}
+    <Center className="h-screen bg-primary-600 dark:bg-primary-800">
+      <VStack space="xl" className="p-8">
+        <Heading size="3xl" className="text-center">
+          TriviaLynx
+        </Heading>
+        <VStack space="sm">
+          <Heading size="lg" className="text-center">
+            Please Use a Mobile Device
+          </Heading>
+          <Text size="md" className="text-center text-primary-100">
+            This trivia game is designed for mobile and tablet devices. Please
+            open this page on your phone or tablet to play.
+          </Text>
+        </VStack>
+      </VStack>
     </Center>
   );
 }
@@ -280,24 +283,17 @@ function SideContainerWeb() {
 function MobileHeader() {
   return (
     <VStack space="md" className="px-3 mt-4.5">
-      <VStack space="xs" className="ml-1 my-4">
-        <HStack>
-          {/* <MobileStyledImage
-            alt="gluestack-ui Pro"
-            resizeMode="contain"
-            sx={{
-              "@md": {
-                w: "$120",
-                h: "$80",
-              },
-            }}
-            source={require("../assets/images/trivialynx-logo.svg")}
-          /> */}
-          <VStack className="ml-4">
-            <Heading className="text-textLight-50 dark:text-textDark-50">
+      <VStack space="xl" className="p-8">
+        <Heading size="2xl" className="text-center">
+          TriviaLynx
+        </Heading>
+
+        <HStack className="flex flex-col justify-center">
+          <VStack>
+            <Heading className="text-center text-textLight-50 dark:text-textDark-50">
               Let's get ready to trivia
             </Heading>
-            <Text className="text-md font-normal text-textLight-100 dark:text-textDark-400">
+            <Text className="text-center text-md font-normal text-muted-foreground dark:text-muted-foreground">
               Enter join code and team name
             </Text>
           </VStack>
@@ -307,29 +303,14 @@ function MobileHeader() {
   );
 }
 
-const Main = () => {
-  return (
-    <>
-      <Box className="md:hidden ">
-        <MobileHeader />
-      </Box>
-      <Box className="px-4 md:px-8 rounded-t-2xl md:rounded-tl-none md:rounded-r-2xl py-8 flex-1 bg-backgroundLight-0 justify-between">
-        <Heading className="hidden mb-8 md:flex md:text-2xl md:justify-center">
-          Enter join code and team name
-        </Heading>
+export default function JoinPage() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width > 1024; // Standard desktop breakpoint
 
-        <JoinEventForm />
+  if (isDesktop) {
+    return <DesktopMessage />;
+  }
 
-        <HStack
-          space="xs"
-          className="items-center justify-center mt-auto"
-        ></HStack>
-      </Box>
-    </>
-  );
-};
-
-const index = ({ children }: { children: React.ReactNode }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -346,22 +327,22 @@ const index = ({ children }: { children: React.ReactNode }) => {
               justifyContent: "center",
             }}
             bounces={false}
-            className="flex-1 base:bg-zinc-700 md:bg-primary-700 dark:bg-backgroundDark-900"
+            className="flex-1 base:bg-zinc-700 md:bg-primary dark:bg-background"
           >
             <VStack
-              className={`w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex-row md:rounded-xl md:p-24`}
+              className={`w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex md:p-24`}
             >
-              <Box className="hidden md:flex flex-1">
-                <SideContainerWeb />
-              </Box>
+              <Box className="md:px-8 md:rounded-2xl py-8 flex-1 bg-background dark:bg-background justify-between">
+                <MobileHeader />
 
-              <Main />
+                <Box className="px-4 md:px-0">
+                  <JoinEventForm />
+                </Box>
+              </Box>
             </VStack>
           </ScrollView>
         </Box>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
-};
-
-export default index;
+}

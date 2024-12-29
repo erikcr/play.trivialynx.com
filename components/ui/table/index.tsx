@@ -1,24 +1,24 @@
-import React, { createContext, useMemo, useContext } from 'react';
 import {
-  Table as ExpoTable,
-  THead as ExpoTHead,
   TBody as ExpoTBody,
-  TFoot as ExpoTFoot,
-  TR as ExpoTR,
   Caption as ExpoTCaption,
-} from '@expo/html-elements';
+  TFoot as ExpoTFoot,
+  THead as ExpoTHead,
+  TR as ExpoTR,
+  Table as ExpoTable,
+} from "@expo/html-elements";
+import React, { createContext, useMemo, useContext } from "react";
 
+import { Text, View } from "react-native";
 import {
-  tableStyle,
-  tableHeaderStyle,
   tableBodyStyle,
+  tableCaptionStyle,
+  tableDataStyle,
   tableFooterStyle,
   tableHeadStyle,
+  tableHeaderStyle,
   tableRowStyleStyle,
-  tableDataStyle,
-  tableCaptionStyle,
-} from './styles';
-import { Text, View } from 'react-native';
+  tableStyle,
+} from "./styles";
 
 const TableHeaderContext = createContext<{
   isHeaderRow: boolean;
@@ -54,7 +54,7 @@ const Table = React.forwardRef<React.ElementRef<typeof ExpoTable>, ITableProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 const TableHeader = React.forwardRef<
@@ -194,14 +194,14 @@ const TableCaption = React.forwardRef<
   );
 });
 
-Table.displayName = 'Table';
-TableHeader.displayName = 'TableHeader';
-TableBody.displayName = 'TableBody';
-TableFooter.displayName = 'TableFooter';
-TableHead.displayName = 'TableHead';
-TableRow.displayName = 'TableRow';
-TableData.displayName = 'TableData';
-TableCaption.displayName = 'TableCaption';
+Table.displayName = "Table";
+TableHeader.displayName = "TableHeader";
+TableBody.displayName = "TableBody";
+TableFooter.displayName = "TableFooter";
+TableHead.displayName = "TableHead";
+TableRow.displayName = "TableRow";
+TableData.displayName = "TableData";
+TableCaption.displayName = "TableCaption";
 
 export {
   Table,
