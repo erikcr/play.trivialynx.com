@@ -31,6 +31,7 @@ import { Keyboard } from "react-native";
 import { Input, InputField } from "@/components/ui/input";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Center } from "@/components/ui/center";
+import { TriangleAlert } from "lucide-react-native";
 
 // const MobileStyledImage = styled(Image, {
 //   props: {
@@ -146,106 +147,120 @@ const JoinEventForm = () => {
   }, []);
 
   return (
-    <>
-      <VStack className="justify-between">
-        <FormControl isInvalid={!!errors.joinCode} isRequired={true}>
-          <Controller
-            name="joinCode"
-            defaultValue={code ? code : ""}
-            control={control}
-            rules={{
-              validate: async (value) => {
-                try {
-                  await joinEventSchema.parseAsync({ joinCode: value });
-                  return true;
-                } catch (error: any) {
-                  return error.message;
-                }
-              },
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input isDisabled={code ? true : false}>
-                <InputField
-                  placeholder="Join code"
-                  type="text"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  onSubmitEditing={handleKeyPress}
-                  returnKeyType="done"
-                  className="text-sm"
-                />
-              </Input>
-            )}
-          />
-          <FormControlError>
-            <FormControlErrorIcon size="md" />
-            <FormControlErrorText>
-              {errors?.joinCode?.message}
-            </FormControlErrorText>
-          </FormControlError>
-        </FormControl>
+    <Box className="w-full max-w-md mx-auto px-4 py-6 lg:p-8">
+      <VStack space="xl">
+        <VStack space="lg">
+          <FormControl
+            isInvalid={!!errors.joinCode}
+            isRequired={true}
+            size="lg"
+          >
+            <Controller
+              name="joinCode"
+              defaultValue={code ? code : ""}
+              control={control}
+              rules={{
+                validate: async (value) => {
+                  try {
+                    await joinEventSchema.parseAsync({ joinCode: value });
+                    return true;
+                  } catch (error: any) {
+                    return error.message;
+                  }
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  size="lg"
+                  variant="outline"
+                  isDisabled={code ? true : false}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  <InputField
+                    placeholder="Enter event code"
+                    type="text"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    onSubmitEditing={handleKeyPress}
+                    returnKeyType="done"
+                    className="text-base"
+                  />
+                </Input>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="sm" as={TriangleAlert} />
+              <FormControlErrorText>
+                {errors?.joinCode?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
 
-        <FormControl
-          isInvalid={!!errors.teamName}
-          isRequired={true}
-          className="my-6"
+          <FormControl
+            isInvalid={!!errors.teamName}
+            isRequired={true}
+            size="lg"
+          >
+            <Controller
+              name="teamName"
+              defaultValue=""
+              control={control}
+              rules={{
+                validate: async (value) => {
+                  try {
+                    await joinEventSchema.parseAsync({
+                      teamName: value,
+                    });
+                    return true;
+                  } catch (error: any) {
+                    return error.message;
+                  }
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  size="lg"
+                  variant="outline"
+                  className="bg-white dark:bg-gray-800"
+                >
+                  <InputField
+                    placeholder="Enter team name"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    onSubmitEditing={handleKeyPress}
+                    returnKeyType="done"
+                    className="text-base"
+                  />
+                </Input>
+              )}
+            />
+            <FormControlError>
+              <FormControlErrorIcon size="sm" as={TriangleAlert} />
+              <FormControlErrorText>
+                {errors?.teamName?.message}
+              </FormControlErrorText>
+            </FormControlError>
+          </FormControl>
+        </VStack>
+
+        <Button
+          variant="solid"
+          size="lg"
+          onPress={handleSubmit(onSubmit)}
+          className="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 dark:bg-primary-500"
         >
-          <Controller
-            name="teamName"
-            defaultValue=""
-            control={control}
-            rules={{
-              validate: async (value) => {
-                try {
-                  await joinEventSchema.parseAsync({
-                    teamName: value,
-                  });
-                  return true;
-                } catch (error: any) {
-                  return error.message;
-                }
-              },
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input>
-                <InputField
-                  placeholder="Team name"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  onSubmitEditing={handleKeyPress}
-                  returnKeyType="done"
-                  className="text-sm"
-                />
-              </Input>
-            )}
-          />
-          <FormControlError>
-            <FormControlErrorIcon size="sm" />
-            <FormControlErrorText>
-              {errors?.teamName?.message}
-            </FormControlErrorText>
-          </FormControlError>
-
-          <FormControlHelper></FormControlHelper>
-        </FormControl>
+          <ButtonText className="text-base font-medium">Join Event</ButtonText>
+        </Button>
       </VStack>
-      <Button
-        variant="solid"
-        size="lg"
-        onPress={handleSubmit(onSubmit)}
-        className="mt-5 bg-primary-700  dark:bg-primary-500"
-      >
-        <ButtonText className="text-sm">JOIN EVENT</ButtonText>
-      </Button>
-    </>
+    </Box>
   );
 };
 
 function SideContainerWeb() {
   return (
-    <Center className="flex-1 bg-primary-600 dark:bg-primary-600">
+    <Center className="flex-1 bg-primary-600 dark:bg-primary-600 md:rounded-l-2xl">
       {/* <StyledImage
         w="$80"
         h="$80"
@@ -282,7 +297,7 @@ function MobileHeader() {
             <Heading className="text-textLight-50 dark:text-textDark-50">
               Let's get ready to trivia
             </Heading>
-            <Text className="text-md font-normal text-primary-300 dark:text-textDark-400">
+            <Text className="text-md font-normal text-textLight-100 dark:text-textDark-400">
               Enter join code and team name
             </Text>
           </VStack>
@@ -295,17 +310,15 @@ function MobileHeader() {
 const Main = () => {
   return (
     <>
-      <Box className="md:hidden">
+      <Box className="md:hidden ">
         <MobileHeader />
       </Box>
-      <Box className="px-4 md:px-8  md:borderTopLeftRadius-none  md:borderTopRightRadius-none  md:borderBottomRightRadius-none dark:bg-backgroundDark-800 py-8 flex-1 bg-backgroundLight-0 justify-between">
-        <Heading className="hidden mb-8 md:flex  md:text-2xl">
+      <Box className="px-4 md:px-8 rounded-t-2xl md:rounded-tl-none md:rounded-r-2xl py-8 flex-1 bg-backgroundLight-0 justify-between">
+        <Heading className="hidden mb-8 md:flex md:text-2xl md:justify-center">
           Enter join code and team name
         </Heading>
 
         <JoinEventForm />
-
-        {/* <EmailForm /> */}
 
         <HStack
           space="xs"
@@ -320,7 +333,7 @@ const index = ({ children }: { children: React.ReactNode }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Box className="web:h-[100vh]  web:overflow-hidden h-[100%]">
+        <Box className="web:h-[100vh] web:overflow-hidden h-[100%]">
           <StatusBar
             translucent
             barStyle="light-content"
@@ -333,12 +346,12 @@ const index = ({ children }: { children: React.ReactNode }) => {
               justifyContent: "center",
             }}
             bounces={false}
-            className="flex-1 base:bg-primary-700 md:bg-primary-700 p-8  dark:bg-backgroundDark-900"
+            className="flex-1 base:bg-zinc-700 md:bg-primary-700 dark:bg-backgroundDark-900"
           >
             <VStack
-              className={` md:flex-${undefined} w-full flex-1 overflow-hidden md:max-w-containerWidth  md:flex-row  md:rounded-xl `}
+              className={`w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex-row md:rounded-xl md:p-24`}
             >
-              <Box className="hidden md:flex  md:bg-green-400 flex-1">
+              <Box className="hidden md:flex flex-1">
                 <SideContainerWeb />
               </Box>
 
