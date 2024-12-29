@@ -1,7 +1,7 @@
 const imageBabel = require("@unitools/babel-plugin-universal-image");
-const path = require("path");
+const path = require("node:path");
 
-module.exports = function (api) {
+module.exports = (api) => {
   api.cache(true);
   return {
     presets: [

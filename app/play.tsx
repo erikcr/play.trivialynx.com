@@ -31,8 +31,8 @@ import type React from "react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useWindowDimensions } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { z } from "zod";
 
 function DesktopMessage() {
@@ -83,7 +83,9 @@ export default function JoinPage() {
             className="flex-1 base:bg-zinc-700 md:bg-primary dark:bg-background"
           >
             <VStack
-              className={`w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex md:p-24`}
+              className={
+                "w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex md:p-24"
+              }
             >
               <Box className="md:px-8 md:rounded-2xl py-8 flex-1 bg-background dark:bg-background justify-between">
                 <Box className="px-4 md:px-0">Event</Box>

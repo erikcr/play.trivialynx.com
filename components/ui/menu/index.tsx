@@ -102,6 +102,7 @@ const Item = React.forwardRef<
 });
 
 const Separator = React.forwardRef(
+  // biome-ignore lint/suspicious/noExplicitAny: known
   ({ className, ...props }: any, ref?: any) => {
     return (
       <View

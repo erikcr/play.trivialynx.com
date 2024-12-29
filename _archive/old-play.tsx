@@ -6,17 +6,9 @@ import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { ScrollView } from "@/components/ui/scroll-view";
+import { StatusBar } from "@/components/ui/status-bar";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  router,
-  useLocalSearchParams,
-  useRootNavigationState,
-} from "expo-router";
-import React, { useEffect, useState } from "react";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { StatusBar } from "@/components/ui/status-bar";
 import { supabase } from "@/lib/supabase";
 import type {
   QuestionsWithResponses,
@@ -25,6 +17,14 @@ import type {
   TeamsWithResponses,
 } from "@/lib/types/app.types";
 import type { Tables } from "@/lib/types/database.types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  router,
+  useLocalSearchParams,
+  useRootNavigationState,
+} from "expo-router";
+import React, { useEffect, useState } from "react";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 type Event = Tables<"event">;
 type Question = Tables<"question">;
@@ -90,9 +90,7 @@ export default function PlayScreen() {
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("question")
-      .select(
-        "*, response: response (id, submitted_answer, is_correct)",
-      )
+      .select("*, response: response (id, submitted_answer, is_correct)")
       .order("id")
       .eq("round_id", activeRound?.id);
 
@@ -280,7 +278,9 @@ export default function PlayScreen() {
             className="flex-1 base:bg-zinc-700 md:bg-primary dark:bg-background"
           >
             <VStack
-              className={`w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex-row md:rounded-xl md:p-24`}
+              className={
+                "w-full flex-1 overflow-hidden md:max-w-containerWidth md:flex-row md:rounded-xl md:p-24"
+              }
             >
               <Box className="absolute md:hidden">
                 <VStack space="md" className="px-3">
@@ -325,7 +325,9 @@ export default function PlayScreen() {
                         <Heading
                           onPress={() => setActiveTab("rounds")}
                           className={` ${
-                            activeTab === "rounds" ? "border-primary" : "border-b-0"
+                            activeTab === "rounds"
+                              ? "border-primary"
+                              : "border-b-0"
                           } ${
                             activeTab === "rounds"
                               ? "text-foreground"
@@ -338,7 +340,9 @@ export default function PlayScreen() {
                         <Heading
                           onPress={() => setActiveTab("teams")}
                           className={` ${
-                            activeTab === "teams" ? "border-primary" : "border-b-0"
+                            activeTab === "teams"
+                              ? "border-primary"
+                              : "border-b-0"
                           } ${
                             activeTab === "teams"
                               ? "text-foreground"
@@ -385,8 +389,8 @@ export default function PlayScreen() {
                                   item.status === "pending"
                                     ? "text-muted-foreground"
                                     : activeRound?.id === item.id
-                                    ? "text-primary-foreground"
-                                    : "text-foreground"
+                                      ? "text-primary-foreground"
+                                      : "text-foreground"
                                 } `}
                               >
                                 {item.name}

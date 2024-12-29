@@ -13,6 +13,7 @@ const linearGradientStyle = tva({
 });
 
 export const LinearGradient = React.forwardRef(
+  // biome-ignore lint/suspicious/noExplicitAny: known
   ({ className, ...props }: any, ref?: any) => {
     return (
       <ExpoLinearGradient

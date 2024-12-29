@@ -195,7 +195,7 @@ const Grid = forwardRef<React.ElementRef<typeof View>, IGridProps>(
         <View
           ref={ref}
           className={gridStyle({
-            class: className + " " + gridClassMerged,
+            class: `${className} ${gridClassMerged}`,
           })}
           onLayout={(event: any) => {
             const paddingLeftToSubtract =
@@ -292,14 +292,13 @@ const GridItem = forwardRef<React.ElementRef<typeof View>, IGridItemProps>(
             ? 2
             : rowColsCount - 1);
 
-        const flexBasisVal =
-          Math.min(
-            (((calculatedWidth - gutterOffset) * responsiveColSpan) /
-              numColumns /
-              calculatedWidth) *
-              100,
+        const flexBasisVal = `${Math.min(
+          (((calculatedWidth - gutterOffset) * responsiveColSpan) /
+            numColumns /
+            calculatedWidth) *
             100,
-          ) + "%";
+          100,
+        )}%`;
 
         setFlexBasisValue(flexBasisVal);
       }
