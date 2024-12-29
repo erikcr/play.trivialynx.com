@@ -1,58 +1,45 @@
 import React, { useEffect } from "react";
+import { VStack } from "@/components/ui/vstack";
+import { ScrollView } from "@/components/ui/scroll-view";
+import { Heading } from "@/components/ui/heading";
+import { StatusBar } from "@/components/ui/status-bar";
+import { Box } from "@/components/ui/box";
+import { SafeAreaView } from "@/components/ui/safe-area-view";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { HStack } from "@/components/ui/hstack";
+import { Text } from "@/components/ui/text";
 import {
-  Center,
-  Button,
-  FormControl,
-  HStack,
-  Input,
-  Text,
-  VStack,
   useToast,
   Toast,
-  Box,
   ToastTitle,
   ToastDescription,
-  InputField,
+} from "@/components/ui/toast";
+import { z } from "zod";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  FormControl,
   FormControlError,
   FormControlErrorIcon,
   FormControlErrorText,
   FormControlHelper,
-  ButtonText,
-  Image,
-  Heading,
-  Divider,
-} from "@gluestack-ui/themed";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from "@/components/ui/form-control";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Keyboard } from "react-native";
-import { AlertTriangle } from "lucide-react-native";
-import { router, useLocalSearchParams } from "expo-router";
-
-import PrimaryLayout from "../layouts/PrimaryLayout";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "../utils/supabase";
+import { Keyboard } from "react-native";
+import { Input, InputField } from "@/components/ui/input";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Center } from "@/components/ui/center";
 
-import { styled } from "@gluestack-style/react";
-
-const StyledImage = styled(Image, {
-  props: {
-    style: {
-      height: 280,
-      width: 280,
-    },
-  },
-});
-
-const MobileStyledImage = styled(Image, {
-  props: {
-    style: {
-      height: 56,
-      width: 56,
-    },
-  },
-});
+// const MobileStyledImage = styled(Image, {
+//   props: {
+//     style: {
+//       height: 56,
+//       width: 56,
+//     },
+//   },
+// });
 
 const joinEventSchema = z.object({
   joinCode: z
@@ -146,7 +133,7 @@ const JoinEventForm = () => {
 
     if (joinDateStr) {
       const joinDate = JSON.parse(joinDateStr);
-      const fourHours = 4 * 60 * 60 *1000;
+      const fourHours = 4 * 60 * 60 * 1000;
 
       if (Date.now() - joinDate < fourHours) {
         router.replace(`/play?eventId=${joinCode}`);
@@ -160,7 +147,7 @@ const JoinEventForm = () => {
 
   return (
     <>
-      <VStack justifyContent="space-between">
+      <VStack className="justify-between">
         <FormControl isInvalid={!!errors.joinCode} isRequired={true}>
           <Controller
             name="joinCode"
@@ -179,7 +166,6 @@ const JoinEventForm = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <Input isDisabled={code ? true : false}>
                 <InputField
-                  fontSize="$sm"
                   placeholder="Join code"
                   type="text"
                   value={value}
@@ -187,19 +173,24 @@ const JoinEventForm = () => {
                   onBlur={onBlur}
                   onSubmitEditing={handleKeyPress}
                   returnKeyType="done"
+                  className="text-sm"
                 />
               </Input>
             )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="md" as={AlertTriangle} />
+            <FormControlErrorIcon size="md" />
             <FormControlErrorText>
               {errors?.joinCode?.message}
             </FormControlErrorText>
           </FormControlError>
         </FormControl>
 
-        <FormControl my="$6" isInvalid={!!errors.teamName} isRequired={true}>
+        <FormControl
+          isInvalid={!!errors.teamName}
+          isRequired={true}
+          className="my-6"
+        >
           <Controller
             name="teamName"
             defaultValue=""
@@ -219,19 +210,19 @@ const JoinEventForm = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <Input>
                 <InputField
-                  fontSize="$sm"
                   placeholder="Team name"
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   onSubmitEditing={handleKeyPress}
                   returnKeyType="done"
+                  className="text-sm"
                 />
               </Input>
             )}
           />
           <FormControlError>
-            <FormControlErrorIcon size="sm" as={AlertTriangle} />
+            <FormControlErrorIcon size="sm" />
             <FormControlErrorText>
               {errors?.teamName?.message}
             </FormControlErrorText>
@@ -240,118 +231,22 @@ const JoinEventForm = () => {
           <FormControlHelper></FormControlHelper>
         </FormControl>
       </VStack>
-
       <Button
         variant="solid"
         size="lg"
-        mt="$5"
-        sx={{
-          _light: { bg: "$primary700" },
-          _dark: { bg: "$primary500" },
-        }}
         onPress={handleSubmit(onSubmit)}
+        className="mt-5 bg-primary-700  dark:bg-primary-500"
       >
-        <ButtonText fontSize="$sm">JOIN EVENT</ButtonText>
+        <ButtonText className="text-sm">JOIN EVENT</ButtonText>
       </Button>
     </>
   );
 };
 
-function EmailForm() {
-  const {
-    control,
-    formState: { errors },
-    handleSubmit,
-    reset,
-  } = useForm<EmailSchemaType>({
-    resolver: zodResolver(emailSchema),
-  });
-
-  const onSubmit = async (_data: EmailSchemaType) => {
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email: _data.email,
-      options: {
-        // set this to false if you do not want the user to be automatically signed up
-        shouldCreateUser: false,
-        emailRedirectTo: "https://trivitlynx.tech",
-      },
-    });
-
-    console.log(data);
-  };
-
-  const handleKeyPress = () => {
-    Keyboard.dismiss();
-    handleSubmit(onSubmit)();
-  };
-
-  return (
-    <>
-      <Divider mt="$12" mb="$12" />
-
-      <Text>Enter your email to start creating your own</Text>
-
-      <FormControl mt="$6" isInvalid={!!errors.email} isRequired={true}>
-        <Controller
-          name="email"
-          control={control}
-          rules={{
-            validate: async (value) => {
-              try {
-                await emailSchema.parseAsync({ email: value });
-                return true;
-              } catch (error: any) {
-                return error.message;
-              }
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input>
-              <InputField
-                fontSize="$sm"
-                placeholder="Email"
-                type="text"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                onSubmitEditing={handleKeyPress}
-                returnKeyType="done"
-              />
-            </Input>
-          )}
-        />
-        <FormControlError>
-          <FormControlErrorIcon size="md" as={AlertTriangle} />
-          <FormControlErrorText>{errors?.email?.message}</FormControlErrorText>
-        </FormControlError>
-      </FormControl>
-
-      <Button
-        variant="solid"
-        size="lg"
-        mt="$5"
-        sx={{
-          _light: { bg: "$primary700" },
-          _dark: { bg: "$primary500" },
-        }}
-        onPress={handleSubmit(onSubmit)}
-      >
-        <ButtonText fontSize="$sm">CREATE YOUR OWN</ButtonText>
-      </Button>
-    </>
-  );
-}
-
 function SideContainerWeb() {
   return (
-    <Center
-      flex={1}
-      bg="$primary600"
-      sx={{
-        _dark: { bg: "$primary600" },
-      }}
-    >
-      <StyledImage
+    <Center className="flex-1 bg-primary-600 dark:bg-primary-600">
+      {/* <StyledImage
         w="$80"
         h="$80"
         alt="gluestack-ui Pro"
@@ -362,17 +257,17 @@ function SideContainerWeb() {
           },
         }}
         source={require("../assets/images/trivialynx-logo.svg")}
-      />
+      /> */}
     </Center>
   );
 }
 
 function MobileHeader() {
   return (
-    <VStack px="$3" mt="$4.5" space="md">
-      <VStack space="xs" ml="$1" my="$4">
+    <VStack space="md" className="px-3 mt-4.5">
+      <VStack space="xs" className="ml-1 my-4">
         <HStack>
-          <MobileStyledImage
+          {/* <MobileStyledImage
             alt="gluestack-ui Pro"
             resizeMode="contain"
             sx={{
@@ -382,22 +277,12 @@ function MobileHeader() {
               },
             }}
             source={require("../assets/images/trivialynx-logo.svg")}
-          />
-          <VStack ml="$4">
-            <Heading
-              color="$textLight50"
-              sx={{ _dark: { color: "$textDark50" } }}
-            >
+          /> */}
+          <VStack className="ml-4">
+            <Heading className="text-textLight-50 dark:text-textDark-50">
               Let's get ready to trivia
             </Heading>
-            <Text
-              fontSize="$md"
-              fontWeight="normal"
-              color="$primary300"
-              sx={{
-                _dark: { color: "$textDark400" },
-              }}
-            >
+            <Text className="text-md font-normal text-primary-300 dark:text-textDark-400">
               Enter join code and team name
             </Text>
           </VStack>
@@ -410,36 +295,11 @@ function MobileHeader() {
 const Main = () => {
   return (
     <>
-      <Box sx={{ "@md": { display: "none" } }}>
+      <Box className="md:hidden">
         <MobileHeader />
       </Box>
-
-      <Box
-        px="$4"
-        sx={{
-          "@md": {
-            px: "$8",
-            borderTopLeftRadius: "$none",
-            borderTopRightRadius: "$none",
-            borderBottomRightRadius: "$none",
-          },
-          _dark: { bg: "$backgroundDark800" },
-        }}
-        py="$8"
-        flex={1}
-        bg="$backgroundLight0"
-        justifyContent="space-between"
-        borderTopLeftRadius="$2xl"
-        borderTopRightRadius="$2xl"
-        borderBottomRightRadius="$none"
-      >
-        <Heading
-          display="none"
-          mb="$8"
-          sx={{
-            "@md": { display: "flex", fontSize: "$2xl" },
-          }}
-        >
+      <Box className="px-4 md:px-8  md:borderTopLeftRadius-none  md:borderTopRightRadius-none  md:borderBottomRightRadius-none dark:bg-backgroundDark-800 py-8 flex-1 bg-backgroundLight-0 justify-between">
+        <Heading className="hidden mb-8 md:flex  md:text-2xl">
           Enter join code and team name
         </Heading>
 
@@ -449,26 +309,46 @@ const Main = () => {
 
         <HStack
           space="xs"
-          alignItems="center"
-          justifyContent="center"
-          mt="auto"
+          className="items-center justify-center mt-auto"
         ></HStack>
       </Box>
     </>
   );
 };
 
-export default function JoinScreen() {
+const index = ({ children }: { children: React.ReactNode }) => {
   return (
-    <PrimaryLayout>
-      <Box
-        display="none"
-        sx={{ "@md": { display: "flex", bg: "$green400" } }}
-        flex={1}
-      >
-        <SideContainerWeb />
-      </Box>
-      <Main />
-    </PrimaryLayout>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Box className="web:h-[100vh]  web:overflow-hidden h-[100%]">
+          <StatusBar
+            translucent
+            barStyle="light-content"
+            className="bg-transparent"
+          />
+          <ScrollView
+            contentContainerStyle={{
+              alignItems: "center",
+              flexGrow: 1,
+              justifyContent: "center",
+            }}
+            bounces={false}
+            className="flex-1 base:bg-primary-700 md:bg-primary-700 p-8  dark:bg-backgroundDark-900"
+          >
+            <VStack
+              className={` md:flex-${undefined} w-full flex-1 overflow-hidden md:max-w-containerWidth  md:flex-row  md:rounded-xl `}
+            >
+              <Box className="hidden md:flex  md:bg-green-400 flex-1">
+                <SideContainerWeb />
+              </Box>
+
+              <Main />
+            </VStack>
+          </ScrollView>
+        </Box>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
-}
+};
+
+export default index;

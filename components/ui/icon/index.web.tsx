@@ -84,9 +84,7 @@ const createIconUI = ({ ...props }: ParameterTypes) => {
         ? accessClassName(inComingprops?.style)
         : className;
     }, [className, inComingprops?.style]);
-    return (
-      <NewUIIcon ref={ref} {...inComingprops} className={calculateClassName} />
-    );
+    return <NewUIIcon ref={ref} {...inComingprops} className={calculateClassName} />;
   });
 };
 

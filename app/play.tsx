@@ -1,24 +1,15 @@
+import { Image } from "@/components/ui/image";
+import { Alert, AlertIcon, AlertText } from "@/components/ui/alert";
+import { ScrollView } from "@/components/ui/scroll-view";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Box } from "@/components/ui/box";
+import { VStack } from "@/components/ui/vstack";
+import { Text } from "@/components/ui/text";
+import { HStack } from "@/components/ui/hstack";
 import React, { useEffect, useState } from "react";
-import {
-  HStack,
-  Text,
-  VStack,
-  Box,
-  Button,
-  ButtonText,
-  Heading,
-  Divider,
-  Input,
-  InputField,
-  ScrollView,
-  InputIcon,
-  InputSlot,
-  Alert,
-  AlertIcon,
-  AlertText,
-  Image,
-  LinearGradient,
-} from "@gluestack-ui/themed";
 import {
   router,
   useLocalSearchParams,
@@ -26,7 +17,7 @@ import {
 } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckIcon, InfoIcon, XIcon } from "lucide-react-native";
-import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient";
+import { LinearGradient } from '@/components/ui/linear-gradient';
 
 import PrimaryLayout from "../layouts/PrimaryLayout";
 
@@ -39,16 +30,16 @@ import {
   TeamWithResponses,
 } from "@/types/app.types";
 
-import { styled } from "@gluestack-style/react";
+// import { styled } from "@gluestack-style/react";
 
-const MobileStyledImage = styled(Image, {
-  props: {
-    style: {
-      height: 56,
-      width: 56,
-    },
-  },
-});
+// const MobileStyledImage = styled(Image, {
+//   props: {
+//     style: {
+//       height: 56,
+//       width: 56,
+//     },
+//   },
+// });
 
 export default function PlayScreen() {
   const rootNavigationState = useRootNavigationState();
@@ -288,36 +279,26 @@ export default function PlayScreen() {
   return (
     <>
       <PrimaryLayout>
-        <Box position="absolute" sx={{ "@md": { display: "none" } }}>
-          <VStack px="$3" space="md">
-            <VStack space="xs" ml="$1" my="$4">
+        <Box className="absolute md:hidden">
+          <VStack space="md" className="px-3">
+            <VStack space="xs" className="ml-1 my-4">
               <HStack>
-                <MobileStyledImage
-                  alt="gluestack-ui Pro"
-                  resizeMode="contain"
-                  sx={{
-                    "@md": {
-                      w: "$120",
-                      h: "$80",
-                    },
-                  }}
-                  source={require("../assets/images/trivialynx-logo.svg")}
-                />
-                <VStack ml="$4">
-                  <Heading
-                    color="$textLight50"
-                    sx={{ _dark: { color: "$textDark50" } }}
-                  >
+                {/* <MobileStyledImage
+                alt="gluestack-ui Pro"
+                resizeMode="contain"
+                sx={{
+                  "@md": {
+                    w: "$120",
+                    h: "$80",
+                  },
+                }}
+                source={require("../assets/images/trivialynx-logo.svg")}
+              /> */}
+                <VStack className="ml-4">
+                  <Heading className="text-textLight-50 dark:text-textDark-50">
                     {event?.name}
                   </Heading>
-                  <Text
-                    fontSize="$md"
-                    fontWeight="normal"
-                    color="$textLight50"
-                    sx={{
-                      _dark: { color: "$textDark400" },
-                    }}
-                  >
+                  <Text className="text-md font-normal text-textLight-50 dark:text-textDark-400">
                     {myTeam?.name}
                   </Text>
                 </VStack>
@@ -326,82 +307,45 @@ export default function PlayScreen() {
           </VStack>
         </Box>
 
-        <Box
-          sx={{
-            "@md": {
-              px: "$8",
-              borderTopLeftRadius: "$none",
-              borderTopRightRadius: "$none",
-              borderBottomRightRadius: "$none",
-            },
-            _dark: { bg: "$backgroundDark800" },
-          }}
-          mt="$2"
-          flex={1}
-          position="absolute"
-          top="$20"
-          left="$0"
-          right="$0"
-          bottom="$0"
-          bg="$backgroundDark100"
-          justifyContent="flex-start"
-          borderTopLeftRadius="$2xl"
-          borderTopRightRadius="$2xl"
-          borderBottomRightRadius="$none"
-        >
-          <Heading
-            display="none"
-            sx={{
-              "@md": { display: "flex", fontSize: "$2xl" },
-            }}
-          >
+        <Box className="md:px-8  md:borderTopLeftRadius-none  md:borderTopRightRadius-none  md:borderBottomRightRadius-none dark:bg-backgroundDark-800 mt-2 flex-1 absolute top-20 left-0 right-0 bottom-0 bg-backgroundDark-100 justify-start">
+          <Heading className="hidden md:flex  md:text-2xl">
             {event?.name}
           </Heading>
 
-          <Text
-            fontSize="$md"
-            fontWeight="normal"
-            display="none"
-            mb="$8"
-            sx={{
-              "@md": { display: "flex", fontSize: "$2xl" },
-            }}
-          >
+          <Text className="text-md font-normal hidden mb-8 md:flex  md:text-2xl">
             {myTeam?.name}
           </Text>
 
           {event?.status === "PENDING" ? (
-            <Box mt="$10">
-              <Heading display="flex" justifyContent="center">
-                Hang tight
-              </Heading>
+            <Box className="mt-10">
+              <Heading className="flex justify-center">Hang tight</Heading>
 
-              <Text display="flex" justifyContent="center">
+              <Text className="flex justify-center">
                 The organizer will start the event soon.
               </Text>
             </Box>
           ) : (
             <>
               <Box>
-                <HStack pt="$4" mb="$2" flex={1} justifyContent="space-around">
+                <HStack className="pt-4 mb-2 flex-1 justify-around">
                   <Heading
-                    sx={{
-                      "@md": { display: "flex", fontSize: "$2xl" },
-                    }}
-                    color={activeTab === "rounds" ? "$black" : "$light500"}
-                    borderBottomWidth={activeTab === "rounds" ? 1 : 0}
                     onPress={() => setActiveTab("rounds")}
+                    className={` ${
+                      activeTab === "rounds" ? "border" : "border-b-[0px]"
+                    } ${
+                      activeTab === "rounds" ? "text-black" : "text-light-500"
+                    } md:flex  md:text-2xl `}
                   >
                     Rounds
                   </Heading>
 
                   <Heading
-                    sx={{
-                      "@md": { display: "flex", fontSize: "$2xl" },
-                    }}
-                    color={activeTab === "teams" ? "$black" : "$light500"}
-                    borderBottomWidth={activeTab === "teams" ? 1 : 0}
                     onPress={() => setActiveTab("teams")}
+                    className={` ${
+                      activeTab === "teams" ? "border" : "border-b-[0px]"
+                    } ${
+                      activeTab === "teams" ? "text-black" : "text-light-500"
+                    } md:flex  md:text-2xl `}
                   >
                     Teams
                   </Heading>
@@ -409,36 +353,37 @@ export default function PlayScreen() {
               </Box>
 
               {activeTab === "rounds" && (
-                <ScrollView pb="$8">
+                <ScrollView className="pb-8">
                   <ScrollView
-                    mt="$3"
-                    mb="$5"
-                    px="$4"
                     horizontal
                     showsHorizontalScrollIndicator={false}
+                    className="mt-3 mb-5 px-4"
                   >
                     {rounds.map((item, index) => (
                       <Button
                         key={item.id}
-                        h="$8"
-                        mx="$1"
-                        bgColor={
-                          activeRound?.id === item.id ? "$primary700" : ""
-                        }
                         variant={
                           activeRound?.id === item.id ? "solid" : "outline"
                         }
                         disabled={item.status === "PENDING"}
-                        borderColor={
-                          item.status === "PENDING" ? "$light500" : ""
-                        }
                         onPress={() => {
                           setActiveRound(item);
                         }}
+                        className={` ${
+                          item.status === "PENDING"
+                            ? "border-light-500"
+                            : "border-"
+                        } ${
+                          activeRound?.id === item.id ? "bg-primary-700" : "bg-"
+                        } h-8 mx-1 `}
                       >
                         <ButtonText
                           size="sm"
-                          color={item.status === "PENDING" ? "$light500" : ""}
+                          className={` ${
+                            item.status === "PENDING"
+                              ? "text-light-500"
+                              : "text-"
+                          } `}
                         >
                           {item.name}
                         </ButtonText>
@@ -446,57 +391,55 @@ export default function PlayScreen() {
                     ))}
                   </ScrollView>
 
-                  <Box px="$4">
+                  <Box className="px-4">
                     {questions
                       ?.filter((item) => item.status !== "PENDING")
                       .map((item) => (
                         <Box
-                          h="$56"
                           key={item.id}
-                          mb="$4"
-                          px="$2"
-                          borderWidth={1}
-                          borderRadius="$2xl"
-                          justifyContent="center"
+                          className="h-56 mb-4 px-2 border rounded-2xl justify-center"
                         >
-                          <Text pb="$2">{item.question}</Text>
+                          <Text className="pb-2">{item.question}</Text>
                           <Input isDisabled={item?.status === "COMPLETE"}>
                             <InputField
                               type="text"
                               placeholder="Your answer"
-                              borderWidth={item?.status === "COMPLETE" ? 2 : 0}
-                              borderColor={
-                                item?.status === "COMPLETE"
-                                  ? myTeam?.responses.find(
-                                      (i) => i.question.id === item.id
-                                    )?.is_correct
-                                    ? "$green500"
-                                    : "$red500"
-                                  : ""
-                              }
-                              defaultValue={
-                                myTeam?.responses.find(
-                                  (i) => i.question.id === item.id
-                                )?.submitted_answer || ""
-                              }
+                              // defaultValue={
+                              //   myTeam?.responses.find(
+                              //     (i) => i.question.id === item.id
+                              //   )?.submitted_answer || ""
+                              // }
                               onFocus={() => setActiveQuestion(item)}
-                              onChangeText={saveResponse}
                               // onEndEditing={saveResponse}
+                              onChangeText={saveResponse}
+                              // className={` ${
+                              //   item?.status === "COMPLETE"
+                              //     ? myTeam?.responses.find(
+                              //         (i) => i.question.id === item.id
+                              //       )?.is_correct
+                              //       ? "border-green-500"
+                              //       : "border-red-500"
+                              //     : "border-"
+                              // } ${
+                              //   item?.status === "COMPLETE"
+                              //     ? "border-[2px]"
+                              //     : "border-[0px]"
+                              // } `}
                             />
                           </Input>
 
-                          <Text size="sm" pt="$2" bold>
+                          <Text size="sm" bold className="pt-2">
                             Points:{" "}
-                            {item?.status === "COMPLETE"
+                            {/* {item?.status === "COMPLETE"
                               ? myTeam?.responses.find(
                                   (i) => i.question.id === item.id
                                 )?.is_correct
                                 ? item.points
                                 : 0
-                              : item.points}
+                              : item.points} */}
                           </Text>
                           {item?.status === "COMPLETE" && (
-                            <Text size="sm" pt="$2" bold>
+                            <Text size="sm" bold className="pt-2">
                               Answer: {item.answer}
                             </Text>
                           )}
@@ -507,7 +450,7 @@ export default function PlayScreen() {
                       (item) =>
                         item.status === "ONGOING" || item.status === "COMPLETE"
                     ).length && (
-                      <Heading display="flex" justifyContent="center">
+                      <Heading className="flex justify-center">
                         Round pending...
                       </Heading>
                     )}
@@ -516,36 +459,21 @@ export default function PlayScreen() {
               )}
 
               {activeTab === "teams" && (
-                <VStack mx="$3" mt="$3">
+                <VStack className="mx-3 mt-3">
                   {teamsSorted?.map((item, index) => (
-                    <Box key={item.id} px="$8">
-                      <HStack flex={1} justifyContent="space-between">
-                        <Text
-                          fontSize="$md"
-                          fontWeight="normal"
-                          mb="$2"
-                          mr="$10"
-                          sx={{
-                            "@md": { display: "flex", fontSize: "$2xl" },
-                          }}
-                        >
+                    <Box key={item.id} className="px-8">
+                      <HStack className="flex-1 justify-between">
+                        <Text className="text-md font-normal mb-2 mr-10 md:flex  md:text-2xl">
                           {item.name}
                         </Text>
 
-                        <Text
-                          fontSize="$md"
-                          fontWeight="normal"
-                          mb="$2"
-                          sx={{
-                            "@md": { display: "flex", fontSize: "$2xl" },
-                          }}
-                        >
+                        <Text className="text-md font-normal mb-2 md:flex  md:text-2xl">
                           {item.team_total_points}
                         </Text>
                       </HStack>
 
                       {teams && index < teams?.length - 1 && (
-                        <Divider mb="$2" />
+                        <Divider className="mb-2" />
                       )}
                     </Box>
                   ))}
@@ -555,13 +483,12 @@ export default function PlayScreen() {
           )}
         </Box>
       </PrimaryLayout>
-
       {/* {event?.status === "COMPLETE" && (
-        <Alert px="$2.5" py="$5" action="info" variant="solid">
-          <AlertIcon as={InfoIcon} mr="$3" />
-          <AlertText>This event has concluded.</AlertText>
-        </Alert>
-      )} */}
+      <Alert px="$2.5" py="$5" action="info" variant="solid">
+        <AlertIcon as={InfoIcon} mr="$3" />
+        <AlertText>This event has concluded.</AlertText>
+      </Alert>
+    )} */}
     </>
   );
 }

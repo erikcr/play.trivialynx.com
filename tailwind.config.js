@@ -2,11 +2,174 @@ import gluestackPlugin from '@gluestack-ui/nativewind-utils/tailwind-plugin';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: "media",
+  darkMode: "class",
   content: ["app/**/*.{tsx,jsx,ts,js}", "components/**/*.{tsx,jsx,ts,js}"],
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      opacity: {
+        "0": "0",
+        "5": "0.05",
+        "10": "0.1",
+        "20": "0.2",
+        "25": "0.25",
+        "30": "0.3",
+        "40": "0.4",
+        "50": "0.5",
+        "60": "0.6",
+        "70": "0.7",
+        "75": "0.75",
+        "80": "0.8",
+        "90": "0.9",
+        "95": "0.95",
+        "100": "1"
+      },
+
+      lineHeights: {
+        "2xs": "16",
+        "xs": "18",
+        "sm": "20",
+        "md": "22",
+        "lg": "24",
+        "xl": "28",
+        "2xl": "32",
+        "3xl": "40",
+        "4xl": "48",
+        "5xl": "56",
+        "6xl": "72",
+        "7xl": "90"
+      },
+
+      letterSpacings: {
+        "xs": -0.4,
+        "sm": -0.2,
+        "md": "0",
+        "lg": "0.2",
+        "xl": "0.4",
+        "2xl": "1"
+      },
+
+      mediaQueries: {
+        "base": "@media screen and (min-width: 0)",
+        "xs": "@media screen and (min-width: 400px)",
+        "sm": "@media screen and (min-width: 480px)",
+        "md": "@media screen and (min-width: 768px)",
+        "lg": "@media screen and (min-width: 992px)",
+        "xl": "@media screen and (min-width: 1280px)"
+      },
+
+      borderRadius: {
+        "none": "0px",
+        "xs": "2px",
+        "sm": "4px",
+        "md": "6px",
+        "lg": "8px",
+        "xl": "12px",
+        "2xl": "16px",
+        "3xl": "24px",
+        "full": "9999px"
+      },
+
+      borderWidths: {
+        "0": "0",
+        "1": "1",
+        "2": "2",
+        "4": "4",
+        "8": "8",
+        "20": "20",
+        "50": "50"
+      },
+
+      space: {
+        "0": "0",
+        "1": "4",
+        "2": "8",
+        "3": "12",
+        "4": "16",
+        "5": "20",
+        "6": "24",
+        "7": "28",
+        "8": "32",
+        "9": "36",
+        "10": "40",
+        "11": "44",
+        "12": "48",
+        "16": "64",
+        "20": "80",
+        "24": "96",
+        "32": "128",
+        "35": "140",
+        "40": "160",
+        "48": "192",
+        "56": "224",
+        "60": "60",
+        "64": "256",
+        "70": "70",
+        "72": "288",
+        "74": "74",
+        "80": "320",
+        "90": "90",
+        "96": "384",
+        "122": "122",
+        "141": "141",
+        "170": "170",
+        "182": "182",
+        "200": "200",
+        "212": "212",
+        "234": "234",
+        "275": "275",
+        "354": "354",
+        "372": "372",
+        "384": "384",
+        "422": "422",
+        "441": "441",
+        "480": "480",
+        "508": "508",
+        "544": "544",
+        "622": "622",
+        "736": "736",
+        "764": "764",
+        "px": "1px",
+        "0.5": "2",
+        "1.5": "6",
+        "2.5": "10",
+        "3.5": "14",
+        "4.5": "18",
+        "1/2": "50%",
+        "1/3": "33.333%",
+        "2/3": "66.666%",
+        "1/4": "25%",
+        "2/4": "50%",
+        "3/4": "75%",
+        "1/5": "20%",
+        "2/5": "40%",
+        "3/5": "60%",
+        "4/5": "80%",
+        "1/6": "16.666%",
+        "2/6": "33.333%",
+        "3/6": "50%",
+        "4/6": "66.666%",
+        "5/6": "83.333%",
+        "full": "100%",
+        "25/2": "12%",
+        "100/7": "14%",
+        "6/25": "24%",
+        "3/10": "30%",
+        "9/20": "45%",
+        "12/25": "48%",
+        "7/10": "70%",
+        "authcard": "544",
+        "containerWidth": "1016"
+      },
+
+      screens: {
+        "base": "0px",
+        "sm": "480px",
+        "md": "768px",
+        "lg": "992px",
+        "xl": "1280px"
+      },
+
       colors: {
         primary: {
           0: 'rgb(var(--color-primary-0)/<alpha-value>)',
@@ -22,6 +185,7 @@ module.exports = {
           900: 'rgb(var(--color-primary-900)/<alpha-value>)',
           950: 'rgb(var(--color-primary-950)/<alpha-value>)',
         },
+
         secondary: {
           0: 'rgb(var(--color-secondary-0)/<alpha-value>)',
           50: 'rgb(var(--color-secondary-50)/<alpha-value>)',
@@ -36,6 +200,7 @@ module.exports = {
           900: 'rgb(var(--color-secondary-900)/<alpha-value>)',
           950: 'rgb(var(--color-secondary-950)/<alpha-value>)',
         },
+
         tertiary: {
           50: 'rgb(var(--color-tertiary-50)/<alpha-value>)',
           100: 'rgb(var(--color-tertiary-100)/<alpha-value>)',
@@ -49,6 +214,7 @@ module.exports = {
           900: 'rgb(var(--color-tertiary-900)/<alpha-value>)',
           950: 'rgb(var(--color-tertiary-950)/<alpha-value>)',
         },
+
         error: {
           0: 'rgb(var(--color-error-0)/<alpha-value>)',
           50: 'rgb(var(--color-error-50)/<alpha-value>)',
@@ -63,6 +229,7 @@ module.exports = {
           900: 'rgb(var(--color-error-900)/<alpha-value>)',
           950: 'rgb(var(--color-error-950)/<alpha-value>)',
         },
+
         success: {
           0: 'rgb(var(--color-success-0)/<alpha-value>)',
           50: 'rgb(var(--color-success-50)/<alpha-value>)',
@@ -77,6 +244,7 @@ module.exports = {
           900: 'rgb(var(--color-success-900)/<alpha-value>)',
           950: 'rgb(var(--color-success-950)/<alpha-value>)',
         },
+
         warning: {
           0: 'rgb(var(--color-warning-0)/<alpha-value>)',
           50: 'rgb(var(--color-warning-50)/<alpha-value>)',
@@ -91,6 +259,7 @@ module.exports = {
           900: 'rgb(var(--color-warning-900)/<alpha-value>)',
           950: 'rgb(var(--color-warning-950)/<alpha-value>)',
         },
+
         info: {
           0: 'rgb(var(--color-info-0)/<alpha-value>)',
           50: 'rgb(var(--color-info-50)/<alpha-value>)',
@@ -105,6 +274,7 @@ module.exports = {
           900: 'rgb(var(--color-info-900)/<alpha-value>)',
           950: 'rgb(var(--color-info-950)/<alpha-value>)',
         },
+
         typography: {
           0: 'rgb(var(--color-typography-0)/<alpha-value>)',
           50: 'rgb(var(--color-typography-50)/<alpha-value>)',
@@ -122,6 +292,7 @@ module.exports = {
           gray: '#D4D4D4',
           black: '#181718',
         },
+
         outline: {
           0: 'rgb(var(--color-outline-0)/<alpha-value>)',
           50: 'rgb(var(--color-outline-50)/<alpha-value>)',
@@ -136,6 +307,7 @@ module.exports = {
           900: 'rgb(var(--color-outline-900)/<alpha-value>)',
           950: 'rgb(var(--color-outline-950)/<alpha-value>)',
         },
+
         background: {
           0: 'rgb(var(--color-background-0)/<alpha-value>)',
           50: 'rgb(var(--color-background-50)/<alpha-value>)',
@@ -157,24 +329,454 @@ module.exports = {
           light: '#FBFBFB',
           dark: '#181719',
         },
+
         indicator: {
           primary: 'rgb(var(--color-indicator-primary)/<alpha-value>)',
           info: 'rgb(var(--color-indicator-info)/<alpha-value>)',
           error: 'rgb(var(--color-indicator-error)/<alpha-value>)',
         },
+
+        rose: {
+          50: "rgb(var(--color-rose-50)/<alpha-value>)",
+          100: "rgb(var(--color-rose-100)/<alpha-value>)",
+          200: "rgb(var(--color-rose-200)/<alpha-value>)",
+          300: "rgb(var(--color-rose-300)/<alpha-value>)",
+          400: "rgb(var(--color-rose-400)/<alpha-value>)",
+          500: "rgb(var(--color-rose-500)/<alpha-value>)",
+          600: "rgb(var(--color-rose-600)/<alpha-value>)",
+          700: "rgb(var(--color-rose-700)/<alpha-value>)",
+          800: "rgb(var(--color-rose-800)/<alpha-value>)",
+          900: "rgb(var(--color-rose-900)/<alpha-value>)"
+        },
+
+        pink: {
+          50: "rgb(var(--color-pink-50)/<alpha-value>)",
+          100: "rgb(var(--color-pink-100)/<alpha-value>)",
+          200: "rgb(var(--color-pink-200)/<alpha-value>)",
+          300: "rgb(var(--color-pink-300)/<alpha-value>)",
+          400: "rgb(var(--color-pink-400)/<alpha-value>)",
+          500: "rgb(var(--color-pink-500)/<alpha-value>)",
+          600: "rgb(var(--color-pink-600)/<alpha-value>)",
+          700: "rgb(var(--color-pink-700)/<alpha-value>)",
+          800: "rgb(var(--color-pink-800)/<alpha-value>)",
+          900: "rgb(var(--color-pink-900)/<alpha-value>)"
+        },
+
+        fuchsia: {
+          50: "rgb(var(--color-fuchsia-50)/<alpha-value>)",
+          100: "rgb(var(--color-fuchsia-100)/<alpha-value>)",
+          200: "rgb(var(--color-fuchsia-200)/<alpha-value>)",
+          300: "rgb(var(--color-fuchsia-300)/<alpha-value>)",
+          400: "rgb(var(--color-fuchsia-400)/<alpha-value>)",
+          500: "rgb(var(--color-fuchsia-500)/<alpha-value>)",
+          600: "rgb(var(--color-fuchsia-600)/<alpha-value>)",
+          700: "rgb(var(--color-fuchsia-700)/<alpha-value>)",
+          800: "rgb(var(--color-fuchsia-800)/<alpha-value>)",
+          900: "rgb(var(--color-fuchsia-900)/<alpha-value>)"
+        },
+
+        purple: {
+          50: "rgb(var(--color-purple-50)/<alpha-value>)",
+          100: "rgb(var(--color-purple-100)/<alpha-value>)",
+          200: "rgb(var(--color-purple-200)/<alpha-value>)",
+          300: "rgb(var(--color-purple-300)/<alpha-value>)",
+          400: "rgb(var(--color-purple-400)/<alpha-value>)",
+          500: "rgb(var(--color-purple-500)/<alpha-value>)",
+          600: "rgb(var(--color-purple-600)/<alpha-value>)",
+          700: "rgb(var(--color-purple-700)/<alpha-value>)",
+          800: "rgb(var(--color-purple-800)/<alpha-value>)",
+          900: "rgb(var(--color-purple-900)/<alpha-value>)"
+        },
+
+        violet: {
+          50: "rgb(var(--color-violet-50)/<alpha-value>)",
+          100: "rgb(var(--color-violet-100)/<alpha-value>)",
+          200: "rgb(var(--color-violet-200)/<alpha-value>)",
+          300: "rgb(var(--color-violet-300)/<alpha-value>)",
+          400: "rgb(var(--color-violet-400)/<alpha-value>)",
+          500: "rgb(var(--color-violet-500)/<alpha-value>)",
+          600: "rgb(var(--color-violet-600)/<alpha-value>)",
+          700: "rgb(var(--color-violet-700)/<alpha-value>)",
+          800: "rgb(var(--color-violet-800)/<alpha-value>)",
+          900: "rgb(var(--color-violet-900)/<alpha-value>)"
+        },
+
+        indigo: {
+          50: "rgb(var(--color-indigo-50)/<alpha-value>)",
+          100: "rgb(var(--color-indigo-100)/<alpha-value>)",
+          200: "rgb(var(--color-indigo-200)/<alpha-value>)",
+          300: "rgb(var(--color-indigo-300)/<alpha-value>)",
+          400: "rgb(var(--color-indigo-400)/<alpha-value>)",
+          500: "rgb(var(--color-indigo-500)/<alpha-value>)",
+          600: "rgb(var(--color-indigo-600)/<alpha-value>)",
+          700: "rgb(var(--color-indigo-700)/<alpha-value>)",
+          800: "rgb(var(--color-indigo-800)/<alpha-value>)",
+          900: "rgb(var(--color-indigo-900)/<alpha-value>)"
+        },
+
+        blue: {
+          50: "rgb(var(--color-blue-50)/<alpha-value>)",
+          100: "rgb(var(--color-blue-100)/<alpha-value>)",
+          200: "rgb(var(--color-blue-200)/<alpha-value>)",
+          300: "rgb(var(--color-blue-300)/<alpha-value>)",
+          400: "rgb(var(--color-blue-400)/<alpha-value>)",
+          500: "rgb(var(--color-blue-500)/<alpha-value>)",
+          600: "rgb(var(--color-blue-600)/<alpha-value>)",
+          700: "rgb(var(--color-blue-700)/<alpha-value>)",
+          800: "rgb(var(--color-blue-800)/<alpha-value>)",
+          900: "rgb(var(--color-blue-900)/<alpha-value>)"
+        },
+
+        lightBlue: {
+          50: "rgb(var(--color-lightBlue-50)/<alpha-value>)",
+          100: "rgb(var(--color-lightBlue-100)/<alpha-value>)",
+          200: "rgb(var(--color-lightBlue-200)/<alpha-value>)",
+          300: "rgb(var(--color-lightBlue-300)/<alpha-value>)",
+          400: "rgb(var(--color-lightBlue-400)/<alpha-value>)",
+          500: "rgb(var(--color-lightBlue-500)/<alpha-value>)",
+          600: "rgb(var(--color-lightBlue-600)/<alpha-value>)",
+          700: "rgb(var(--color-lightBlue-700)/<alpha-value>)",
+          800: "rgb(var(--color-lightBlue-800)/<alpha-value>)",
+          900: "rgb(var(--color-lightBlue-900)/<alpha-value>)"
+        },
+
+        darkBlue: {
+          50: "rgb(var(--color-darkBlue-50)/<alpha-value>)",
+          100: "rgb(var(--color-darkBlue-100)/<alpha-value>)",
+          200: "rgb(var(--color-darkBlue-200)/<alpha-value>)",
+          300: "rgb(var(--color-darkBlue-300)/<alpha-value>)",
+          400: "rgb(var(--color-darkBlue-400)/<alpha-value>)",
+          500: "rgb(var(--color-darkBlue-500)/<alpha-value>)",
+          600: "rgb(var(--color-darkBlue-600)/<alpha-value>)",
+          700: "rgb(var(--color-darkBlue-700)/<alpha-value>)",
+          800: "rgb(var(--color-darkBlue-800)/<alpha-value>)",
+          900: "rgb(var(--color-darkBlue-900)/<alpha-value>)"
+        },
+
+        cyan: {
+          50: "rgb(var(--color-cyan-50)/<alpha-value>)",
+          100: "rgb(var(--color-cyan-100)/<alpha-value>)",
+          200: "rgb(var(--color-cyan-200)/<alpha-value>)",
+          300: "rgb(var(--color-cyan-300)/<alpha-value>)",
+          400: "rgb(var(--color-cyan-400)/<alpha-value>)",
+          500: "rgb(var(--color-cyan-500)/<alpha-value>)",
+          600: "rgb(var(--color-cyan-600)/<alpha-value>)",
+          700: "rgb(var(--color-cyan-700)/<alpha-value>)",
+          800: "rgb(var(--color-cyan-800)/<alpha-value>)",
+          900: "rgb(var(--color-cyan-900)/<alpha-value>)"
+        },
+
+        teal: {
+          50: "rgb(var(--color-teal-50)/<alpha-value>)",
+          100: "rgb(var(--color-teal-100)/<alpha-value>)",
+          200: "rgb(var(--color-teal-200)/<alpha-value>)",
+          300: "rgb(var(--color-teal-300)/<alpha-value>)",
+          400: "rgb(var(--color-teal-400)/<alpha-value>)",
+          500: "rgb(var(--color-teal-500)/<alpha-value>)",
+          600: "rgb(var(--color-teal-600)/<alpha-value>)",
+          700: "rgb(var(--color-teal-700)/<alpha-value>)",
+          800: "rgb(var(--color-teal-800)/<alpha-value>)",
+          900: "rgb(var(--color-teal-900)/<alpha-value>)"
+        },
+
+        emerald: {
+          50: "rgb(var(--color-emerald-50)/<alpha-value>)",
+          100: "rgb(var(--color-emerald-100)/<alpha-value>)",
+          200: "rgb(var(--color-emerald-200)/<alpha-value>)",
+          300: "rgb(var(--color-emerald-300)/<alpha-value>)",
+          400: "rgb(var(--color-emerald-400)/<alpha-value>)",
+          500: "rgb(var(--color-emerald-500)/<alpha-value>)",
+          600: "rgb(var(--color-emerald-600)/<alpha-value>)",
+          700: "rgb(var(--color-emerald-700)/<alpha-value>)",
+          800: "rgb(var(--color-emerald-800)/<alpha-value>)",
+          900: "rgb(var(--color-emerald-900)/<alpha-value>)"
+        },
+
+        green: {
+          50: "rgb(var(--color-green-50)/<alpha-value>)",
+          100: "rgb(var(--color-green-100)/<alpha-value>)",
+          200: "rgb(var(--color-green-200)/<alpha-value>)",
+          300: "rgb(var(--color-green-300)/<alpha-value>)",
+          400: "rgb(var(--color-green-400)/<alpha-value>)",
+          500: "rgb(var(--color-green-500)/<alpha-value>)",
+          600: "rgb(var(--color-green-600)/<alpha-value>)",
+          700: "rgb(var(--color-green-700)/<alpha-value>)",
+          800: "rgb(var(--color-green-800)/<alpha-value>)",
+          900: "rgb(var(--color-green-900)/<alpha-value>)"
+        },
+
+        lime: {
+          50: "rgb(var(--color-lime-50)/<alpha-value>)",
+          100: "rgb(var(--color-lime-100)/<alpha-value>)",
+          200: "rgb(var(--color-lime-200)/<alpha-value>)",
+          300: "rgb(var(--color-lime-300)/<alpha-value>)",
+          400: "rgb(var(--color-lime-400)/<alpha-value>)",
+          500: "rgb(var(--color-lime-500)/<alpha-value>)",
+          600: "rgb(var(--color-lime-600)/<alpha-value>)",
+          700: "rgb(var(--color-lime-700)/<alpha-value>)",
+          800: "rgb(var(--color-lime-800)/<alpha-value>)",
+          900: "rgb(var(--color-lime-900)/<alpha-value>)"
+        },
+
+        yellow: {
+          50: "rgb(var(--color-yellow-50)/<alpha-value>)",
+          100: "rgb(var(--color-yellow-100)/<alpha-value>)",
+          200: "rgb(var(--color-yellow-200)/<alpha-value>)",
+          300: "rgb(var(--color-yellow-300)/<alpha-value>)",
+          400: "rgb(var(--color-yellow-400)/<alpha-value>)",
+          500: "rgb(var(--color-yellow-500)/<alpha-value>)",
+          600: "rgb(var(--color-yellow-600)/<alpha-value>)",
+          700: "rgb(var(--color-yellow-700)/<alpha-value>)",
+          800: "rgb(var(--color-yellow-800)/<alpha-value>)",
+          900: "rgb(var(--color-yellow-900)/<alpha-value>)"
+        },
+
+        amber: {
+          50: "rgb(var(--color-amber-50)/<alpha-value>)",
+          100: "rgb(var(--color-amber-100)/<alpha-value>)",
+          200: "rgb(var(--color-amber-200)/<alpha-value>)",
+          300: "rgb(var(--color-amber-300)/<alpha-value>)",
+          400: "rgb(var(--color-amber-400)/<alpha-value>)",
+          500: "rgb(var(--color-amber-500)/<alpha-value>)",
+          600: "rgb(var(--color-amber-600)/<alpha-value>)",
+          700: "rgb(var(--color-amber-700)/<alpha-value>)",
+          800: "rgb(var(--color-amber-800)/<alpha-value>)",
+          900: "rgb(var(--color-amber-900)/<alpha-value>)"
+        },
+
+        orange: {
+          50: "rgb(var(--color-orange-50)/<alpha-value>)",
+          100: "rgb(var(--color-orange-100)/<alpha-value>)",
+          200: "rgb(var(--color-orange-200)/<alpha-value>)",
+          300: "rgb(var(--color-orange-300)/<alpha-value>)",
+          400: "rgb(var(--color-orange-400)/<alpha-value>)",
+          500: "rgb(var(--color-orange-500)/<alpha-value>)",
+          600: "rgb(var(--color-orange-600)/<alpha-value>)",
+          700: "rgb(var(--color-orange-700)/<alpha-value>)",
+          800: "rgb(var(--color-orange-800)/<alpha-value>)",
+          900: "rgb(var(--color-orange-900)/<alpha-value>)"
+        },
+
+        red: {
+          50: "rgb(var(--color-red-50)/<alpha-value>)",
+          100: "rgb(var(--color-red-100)/<alpha-value>)",
+          200: "rgb(var(--color-red-200)/<alpha-value>)",
+          300: "rgb(var(--color-red-300)/<alpha-value>)",
+          400: "rgb(var(--color-red-400)/<alpha-value>)",
+          500: "rgb(var(--color-red-500)/<alpha-value>)",
+          600: "rgb(var(--color-red-600)/<alpha-value>)",
+          700: "rgb(var(--color-red-700)/<alpha-value>)",
+          800: "rgb(var(--color-red-800)/<alpha-value>)",
+          900: "rgb(var(--color-red-900)/<alpha-value>)"
+        },
+
+        warmGray: {
+          50: "rgb(var(--color-warmGray-50)/<alpha-value>)",
+          100: "rgb(var(--color-warmGray-100)/<alpha-value>)",
+          200: "rgb(var(--color-warmGray-200)/<alpha-value>)",
+          300: "rgb(var(--color-warmGray-300)/<alpha-value>)",
+          400: "rgb(var(--color-warmGray-400)/<alpha-value>)",
+          500: "rgb(var(--color-warmGray-500)/<alpha-value>)",
+          600: "rgb(var(--color-warmGray-600)/<alpha-value>)",
+          700: "rgb(var(--color-warmGray-700)/<alpha-value>)",
+          800: "rgb(var(--color-warmGray-800)/<alpha-value>)",
+          900: "rgb(var(--color-warmGray-900)/<alpha-value>)"
+        },
+
+        trueGray: {
+          50: "rgb(var(--color-trueGray-50)/<alpha-value>)",
+          100: "rgb(var(--color-trueGray-100)/<alpha-value>)",
+          200: "rgb(var(--color-trueGray-200)/<alpha-value>)",
+          300: "rgb(var(--color-trueGray-300)/<alpha-value>)",
+          400: "rgb(var(--color-trueGray-400)/<alpha-value>)",
+          500: "rgb(var(--color-trueGray-500)/<alpha-value>)",
+          600: "rgb(var(--color-trueGray-600)/<alpha-value>)",
+          700: "rgb(var(--color-trueGray-700)/<alpha-value>)",
+          800: "rgb(var(--color-trueGray-800)/<alpha-value>)",
+          900: "rgb(var(--color-trueGray-900)/<alpha-value>)"
+        },
+
+        coolGray: {
+          50: "rgb(var(--color-coolGray-50)/<alpha-value>)",
+          100: "rgb(var(--color-coolGray-100)/<alpha-value>)",
+          200: "rgb(var(--color-coolGray-200)/<alpha-value>)",
+          300: "rgb(var(--color-coolGray-300)/<alpha-value>)",
+          400: "rgb(var(--color-coolGray-400)/<alpha-value>)",
+          500: "rgb(var(--color-coolGray-500)/<alpha-value>)",
+          600: "rgb(var(--color-coolGray-600)/<alpha-value>)",
+          700: "rgb(var(--color-coolGray-700)/<alpha-value>)",
+          800: "rgb(var(--color-coolGray-800)/<alpha-value>)",
+          900: "rgb(var(--color-coolGray-900)/<alpha-value>)"
+        },
+
+        blueGray: {
+          50: "rgb(var(--color-blueGray-50)/<alpha-value>)",
+          100: "rgb(var(--color-blueGray-100)/<alpha-value>)",
+          200: "rgb(var(--color-blueGray-200)/<alpha-value>)",
+          300: "rgb(var(--color-blueGray-300)/<alpha-value>)",
+          400: "rgb(var(--color-blueGray-400)/<alpha-value>)",
+          500: "rgb(var(--color-blueGray-500)/<alpha-value>)",
+          600: "rgb(var(--color-blueGray-600)/<alpha-value>)",
+          700: "rgb(var(--color-blueGray-700)/<alpha-value>)",
+          800: "rgb(var(--color-blueGray-800)/<alpha-value>)",
+          900: "rgb(var(--color-blueGray-900)/<alpha-value>)"
+        },
+
+        light: {
+          50: "rgb(var(--color-light-50)/<alpha-value>)",
+          100: "rgb(var(--color-light-100)/<alpha-value>)",
+          200: "rgb(var(--color-light-200)/<alpha-value>)",
+          300: "rgb(var(--color-light-300)/<alpha-value>)",
+          400: "rgb(var(--color-light-400)/<alpha-value>)",
+          500: "rgb(var(--color-light-500)/<alpha-value>)",
+          600: "rgb(var(--color-light-600)/<alpha-value>)",
+          700: "rgb(var(--color-light-700)/<alpha-value>)",
+          800: "rgb(var(--color-light-800)/<alpha-value>)",
+          900: "rgb(var(--color-light-900)/<alpha-value>)"
+        },
+
+        textLight: {
+          0: "rgb(var(--color-textLight-0)/<alpha-value>)",
+          50: "rgb(var(--color-textLight-50)/<alpha-value>)",
+          100: "rgb(var(--color-textLight-100)/<alpha-value>)",
+          200: "rgb(var(--color-textLight-200)/<alpha-value>)",
+          300: "rgb(var(--color-textLight-300)/<alpha-value>)",
+          400: "rgb(var(--color-textLight-400)/<alpha-value>)",
+          500: "rgb(var(--color-textLight-500)/<alpha-value>)",
+          600: "rgb(var(--color-textLight-600)/<alpha-value>)",
+          700: "rgb(var(--color-textLight-700)/<alpha-value>)",
+          800: "rgb(var(--color-textLight-800)/<alpha-value>)",
+          900: "rgb(var(--color-textLight-900)/<alpha-value>)",
+          950: "rgb(var(--color-textLight-950)/<alpha-value>)"
+        },
+
+        textDark: {
+          0: "rgb(var(--color-textDark-0)/<alpha-value>)",
+          50: "rgb(var(--color-textDark-50)/<alpha-value>)",
+          100: "rgb(var(--color-textDark-100)/<alpha-value>)",
+          200: "rgb(var(--color-textDark-200)/<alpha-value>)",
+          300: "rgb(var(--color-textDark-300)/<alpha-value>)",
+          400: "rgb(var(--color-textDark-400)/<alpha-value>)",
+          500: "rgb(var(--color-textDark-500)/<alpha-value>)",
+          600: "rgb(var(--color-textDark-600)/<alpha-value>)",
+          700: "rgb(var(--color-textDark-700)/<alpha-value>)",
+          800: "rgb(var(--color-textDark-800)/<alpha-value>)",
+          900: "rgb(var(--color-textDark-900)/<alpha-value>)",
+          950: "rgb(var(--color-textDark-950)/<alpha-value>)"
+        },
+
+        borderDark: {
+          0: "rgb(var(--color-borderDark-0)/<alpha-value>)",
+          50: "rgb(var(--color-borderDark-50)/<alpha-value>)",
+          100: "rgb(var(--color-borderDark-100)/<alpha-value>)",
+          200: "rgb(var(--color-borderDark-200)/<alpha-value>)",
+          300: "rgb(var(--color-borderDark-300)/<alpha-value>)",
+          400: "rgb(var(--color-borderDark-400)/<alpha-value>)",
+          500: "rgb(var(--color-borderDark-500)/<alpha-value>)",
+          600: "rgb(var(--color-borderDark-600)/<alpha-value>)",
+          700: "rgb(var(--color-borderDark-700)/<alpha-value>)",
+          800: "rgb(var(--color-borderDark-800)/<alpha-value>)",
+          900: "rgb(var(--color-borderDark-900)/<alpha-value>)",
+          950: "rgb(var(--color-borderDark-950)/<alpha-value>)"
+        },
+
+        borderLight: {
+          0: "rgb(var(--color-borderLight-0)/<alpha-value>)",
+          50: "rgb(var(--color-borderLight-50)/<alpha-value>)",
+          100: "rgb(var(--color-borderLight-100)/<alpha-value>)",
+          200: "rgb(var(--color-borderLight-200)/<alpha-value>)",
+          300: "rgb(var(--color-borderLight-300)/<alpha-value>)",
+          400: "rgb(var(--color-borderLight-400)/<alpha-value>)",
+          500: "rgb(var(--color-borderLight-500)/<alpha-value>)",
+          600: "rgb(var(--color-borderLight-600)/<alpha-value>)",
+          700: "rgb(var(--color-borderLight-700)/<alpha-value>)",
+          800: "rgb(var(--color-borderLight-800)/<alpha-value>)",
+          900: "rgb(var(--color-borderLight-900)/<alpha-value>)",
+          950: "rgb(var(--color-borderLight-950)/<alpha-value>)"
+        },
+
+        backgroundDark: {
+          0: "rgb(var(--color-backgroundDark-0)/<alpha-value>)",
+          50: "rgb(var(--color-backgroundDark-50)/<alpha-value>)",
+          100: "rgb(var(--color-backgroundDark-100)/<alpha-value>)",
+          200: "rgb(var(--color-backgroundDark-200)/<alpha-value>)",
+          300: "rgb(var(--color-backgroundDark-300)/<alpha-value>)",
+          400: "rgb(var(--color-backgroundDark-400)/<alpha-value>)",
+          500: "rgb(var(--color-backgroundDark-500)/<alpha-value>)",
+          600: "rgb(var(--color-backgroundDark-600)/<alpha-value>)",
+          700: "rgb(var(--color-backgroundDark-700)/<alpha-value>)",
+          800: "rgb(var(--color-backgroundDark-800)/<alpha-value>)",
+          900: "rgb(var(--color-backgroundDark-900)/<alpha-value>)",
+          950: "rgb(var(--color-backgroundDark-950)/<alpha-value>)"
+        },
+
+        backgroundLight: {
+          0: "rgb(var(--color-backgroundLight-0)/<alpha-value>)",
+          50: "rgb(var(--color-backgroundLight-50)/<alpha-value>)",
+          100: "rgb(var(--color-backgroundLight-100)/<alpha-value>)",
+          200: "rgb(var(--color-backgroundLight-200)/<alpha-value>)",
+          300: "rgb(var(--color-backgroundLight-300)/<alpha-value>)",
+          400: "rgb(var(--color-backgroundLight-400)/<alpha-value>)",
+          500: "rgb(var(--color-backgroundLight-500)/<alpha-value>)",
+          600: "rgb(var(--color-backgroundLight-600)/<alpha-value>)",
+          700: "rgb(var(--color-backgroundLight-700)/<alpha-value>)",
+          800: "rgb(var(--color-backgroundLight-800)/<alpha-value>)",
+          900: "rgb(var(--color-backgroundLight-900)/<alpha-value>)",
+          950: "rgb(var(--color-backgroundLight-950)/<alpha-value>)"
+        },
+
+        "backgroundLightError": "rgb(var(--color-backgroundLightError)/<alpha-value>)",
+        "backgroundDarkError": "rgb(var(--color-backgroundDarkError)/<alpha-value>)",
+        "backgroundLightWarning": "rgb(var(--color-backgroundLightWarning)/<alpha-value>)",
+        "backgroundDarkWarning": "rgb(var(--color-backgroundDarkWarning)/<alpha-value>)",
+        "backgroundLightSuccess": "rgb(var(--color-backgroundLightSuccess)/<alpha-value>)",
+        "backgroundDarkSuccess": "rgb(var(--color-backgroundDarkSuccess)/<alpha-value>)",
+        "backgroundLightInfo": "rgb(var(--color-backgroundLightInfo)/<alpha-value>)",
+        "backgroundDarkInfo": "rgb(var(--color-backgroundDarkInfo)/<alpha-value>)",
+        "backgroundLightMuted": "rgb(var(--color-backgroundLightMuted)/<alpha-value>)",
+        "backgroundDarkMuted": "rgb(var(--color-backgroundDarkMuted)/<alpha-value>)",
+        "white": "rgb(var(--color-white)/<alpha-value>)",
+        "black": "rgb(var(--color-black)/<alpha-value>)",
+        "error00": "#FEE9E9"
       },
+
       fontFamily: {
         heading: undefined,
         body: undefined,
         mono: undefined,
         roboto: ['Roboto', 'sans-serif'],
       },
+
       fontWeight: {
         extrablack: '950',
+        "hairline": "100",
+        "thin": "200",
+        "light": "300",
+        "normal": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700",
+        "extrabold": "800",
+        "extraBlack": "950"
       },
+
       fontSize: {
-        '2xs': '10px',
+        '2xs': "10px",
+        "xs": "12px",
+        "sm": "14px",
+        "md": "16px",
+        "lg": "18px",
+        "xl": "20px",
+        "2xl": "24px",
+        "3xl": "30px",
+        "4xl": "36px",
+        "5xl": "48px",
+        "6xl": "60px",
+        "7xl": "72px",
+        "8xl": "96px",
+        "9xl": "128px"
       },
+
       boxShadow: {
         'hard-1': '-2px 2px 8px 0px rgba(38, 38, 38, 0.20)',
         'hard-2': '0px 3px 10px 0px rgba(38, 38, 38, 0.20)',
@@ -185,7 +787,7 @@ module.exports = {
         'soft-2': '0px 0px 20px rgba(38, 38, 38, 0.2)',
         'soft-3': '0px 0px 30px rgba(38, 38, 38, 0.1)',
         'soft-4': '0px 0px 40px rgba(38, 38, 38, 0.1)',
-      },
+      }
     },
   },
   plugins: [gluestackPlugin],
