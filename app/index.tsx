@@ -28,12 +28,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { TriangleAlert } from "lucide-react-native";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Keyboard } from "react-native";
 import { useWindowDimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { z } from "zod";
+import { useEventStore } from "@/lib/store/event-store";
 
 type Event = Tables<"event">;
 type Team = Tables<"team">;
@@ -49,7 +50,10 @@ const joinEventSchema = z.object({
 type JoinEventSchemaType = z.infer<typeof joinEventSchema>;
 
 const JoinEventForm = () => {
+  const toast = useToast();
   const { code } = useLocalSearchParams<{ code?: string }>();
+  const { setEvent, setTeam, setIsLoading } = useEventStore();
+  const [toastId, setToastId] = useState("0");
 
   const {
     control,
@@ -60,57 +64,76 @@ const JoinEventForm = () => {
     resolver: zodResolver(joinEventSchema),
   });
 
-  const toast = useToast();
+  const showNewToast = (error?: string) => {
+    const newId = Math.random().toString();
+    setToastId(newId);
+    toast.show({
+      id: newId,
+      placement: "top",
+      duration: 3000,
+      render: ({ id }) => {
+        const uniqueToastId = `toast-${id}`;
+        return (
+          <Toast nativeID={uniqueToastId} action="error" variant="solid">
+            <ToastTitle>Error</ToastTitle>
+            <ToastDescription>
+              {error ? error : "An error occurred"}
+            </ToastDescription>
+          </Toast>
+        );
+      },
+    });
+  };
+
+  const handleToast = (error?: string) => {
+    if (!toast.isActive(toastId)) {
+      showNewToast(error);
+    }
+  };
 
   const onSubmit = async (_data: JoinEventSchemaType) => {
-    await AsyncStorage.clear();
+    setIsLoading(true);
 
-    const { data, error } = await supabase
-      .from("event")
-      .select()
-      .limit(1)
-      .eq("join_code", _data.joinCode)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("event")
+        .select()
+        .limit(1)
+        .eq("join_code", _data.joinCode)
+        .single();
 
-    if (error) {
-      console.error(error);
-    }
+      if (!data) {
+        handleToast("Please double check the code you entered.");
+        return;
+      }
 
-    if (!data) {
-      toast.show({
-        placement: "bottom",
-        render: ({ id }) => {
-          return (
-            <Toast nativeID={id} action="error">
-              <VStack space="xs">
-                <ToastTitle>Invalid join code</ToastTitle>
-                <ToastDescription>
-                  Please double check the code you entered.
-                </ToastDescription>
-              </VStack>
-            </Toast>
-          );
-        },
-      });
-    } else {
       const eventToJoin = data as Event;
+      setEvent(eventToJoin);
 
-      await AsyncStorage.setItem("eventId", eventToJoin.id);
-      await AsyncStorage.setItem("joinDate", JSON.stringify(Date.now()));
-
-      const { data: newTeam } = await supabase
+      const { data: newTeam, error: teamError } = await supabase
         .from("team")
         .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
         .select()
         .single();
 
+      if (teamError?.code === "23505") {
+        handleToast("Team name already taken");
+        return;
+      }
+      if (teamError) {
+        throw teamError;
+      }
+
       if (newTeam) {
-        await AsyncStorage.setItem("myTeam", JSON.stringify(newTeam as Team));
+        setTeam(newTeam as Team);
       }
 
       reset();
-
-      router.replace(`/play?eventId=${eventToJoin.id}`);
+      router.replace(`/play?id=${eventToJoin.id}`);
+    } catch (err) {
+      handleToast(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,9 +156,9 @@ const JoinEventForm = () => {
     }
   };
 
-  useEffect(() => {
-    checkJoinDate();
-  }, []);
+  // useEffect(() => {
+  //   checkJoinDate();
+  // }, []);
 
   return (
     <Box className="w-full max-w-md mx-auto px-4 py-6 lg:p-8">
