@@ -1,5 +1,5 @@
 import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Center } from "@/components/ui/center";
 import {
   FormControl,
@@ -21,12 +21,13 @@ import {
   useToast,
 } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
+import { useEventStore } from "@/lib/store/event-store";
 import { supabase } from "@/lib/supabase";
 import type { Tables } from "@/lib/types/database.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
-import { TriangleAlert } from "lucide-react-native";
+import { Save, TriangleAlert } from "lucide-react-native";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -34,7 +35,6 @@ import { Keyboard } from "react-native";
 import { useWindowDimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { z } from "zod";
-import { useEventStore } from "@/lib/store/event-store";
 
 type Event = Tables<"event">;
 type Round = Tables<"round">;
@@ -98,14 +98,6 @@ export default function PlayPage() {
   const handleSubmitResponse = async (questionId: string) => {
     try {
       await submitResponse(questionId);
-      toast.show({
-        render: ({ id }) => (
-          <Toast nativeID={id}>
-            <ToastTitle>Success</ToastTitle>
-            <ToastDescription>Response submitted successfully</ToastDescription>
-          </Toast>
-        ),
-      });
     } catch (error) {
       toast.show({
         render: ({ id }) => (
@@ -220,24 +212,26 @@ export default function PlayPage() {
                     Points: {question.points}
                   </Text>
                 )}
-                <FormControl>
-                  <Input>
-                    <InputField
-                      placeholder="Enter your answer"
-                      value={responses?.[question.id] || ""}
-                      onChangeText={(text) => setResponse(question.id, text)}
-                      className="text-base placeholder:text-muted-foreground"
-                    />
-                  </Input>
-                </FormControl>
-                <Button
-                  variant="solid"
-                  className="bg-primary"
-                  onPress={() => handleSubmitResponse(question.id)}
-                  disabled={!responses?.[question.id]}
-                >
-                  <ButtonText>Submit Response</ButtonText>
-                </Button>
+                <HStack space="sm" className="w-full">
+                  <FormControl className="flex-1">
+                    <Input>
+                      <InputField
+                        placeholder="Enter your answer"
+                        value={responses?.[question.id] || ""}
+                        onChangeText={(text) => setResponse(question.id, text)}
+                        className="text-base placeholder:text-muted-foreground"
+                      />
+                    </Input>
+                  </FormControl>
+                  <Button
+                    variant="solid"
+                    className="bg-primary p-3.5"
+                    onPress={() => handleSubmitResponse(question.id)}
+                    disabled={!responses?.[question.id]}
+                  >
+                    <ButtonIcon as={Save} className="text-primary-foreground" />
+                  </Button>
+                </HStack>
               </VStack>
             </Box>
           ))}

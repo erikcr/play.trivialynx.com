@@ -240,16 +240,19 @@ export type Database = {
           event_id: string;
           id: string;
           name: string;
+          user_id: string | null;
         };
         Insert: {
           event_id: string;
           id?: string;
           name: string;
+          user_id?: string | null;
         };
         Update: {
           event_id?: string;
           id?: string;
           name?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {

@@ -21,6 +21,7 @@ import {
   useToast,
 } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
+import { useEventStore } from "@/lib/store/event-store";
 import { supabase } from "@/lib/supabase";
 import type { Tables } from "@/lib/types/database.types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +35,6 @@ import { Keyboard } from "react-native";
 import { useWindowDimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { z } from "zod";
-import { useEventStore } from "@/lib/store/event-store";
 
 type Event = Tables<"event">;
 type Team = Tables<"team">;
@@ -95,6 +95,21 @@ const JoinEventForm = () => {
     setIsLoading(true);
 
     try {
+      // First, check if we have an existing session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      // If no session exists, sign in anonymously
+      if (!session) {
+        const {
+          data: { session: newSession },
+          error: authError,
+        } = await supabase.auth.signInAnonymously();
+        if (authError) throw authError;
+      }
+
+      // Get the event data
       const { data, error } = await supabase
         .from("event")
         .select()
@@ -110,9 +125,22 @@ const JoinEventForm = () => {
       const eventToJoin = data as Event;
       setEvent(eventToJoin);
 
+      // Get the current user's ID
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user found");
+
+      // Create the team with the user_id
       const { data: newTeam, error: teamError } = await supabase
         .from("team")
-        .insert([{ name: _data.teamName, event_id: eventToJoin.id }])
+        .insert([
+          {
+            name: _data.teamName,
+            event_id: eventToJoin.id,
+            user_id: user.id,
+          },
+        ])
         .select()
         .single();
 

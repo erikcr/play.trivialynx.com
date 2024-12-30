@@ -1,8 +1,8 @@
+import { supabase } from "@/lib/supabase";
+import type { Tables } from "@/lib/types/database.types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Tables } from "@/lib/types/database.types";
-import { supabase } from "@/lib/supabase";
 
 type Event = Tables<"event">;
 type Team = Tables<"team">;
@@ -20,7 +20,7 @@ interface EventState {
   currentQuestionIndex: number;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   setEvent: (event: Event | null) => void;
   setTeam: (team: Team | null) => void;
@@ -60,12 +60,12 @@ export const useEventStore = create<EventState>()(
       setRounds: (rounds) => set({ rounds }),
       setActiveRound: (round) => set({ activeRound: round }),
       setQuestions: (questions) => set({ questions }),
-      setResponse: (questionId, response) => 
-        set((state) => ({ 
-          responses: { 
-            ...state.responses, 
-            [questionId]: response 
-          } 
+      setResponse: (questionId, response) =>
+        set((state) => ({
+          responses: {
+            ...state.responses,
+            [questionId]: response,
+          },
         })),
       submitResponse: async (questionId: string) => {
         const state = get();
@@ -75,17 +75,16 @@ export const useEventStore = create<EventState>()(
 
         set({ isLoading: true, error: null });
         try {
-          const startTime = new Date();
           const { error } = await supabase
             .from("response")
-            .upsert({
-              team_id: state.team.id,
-              question_id: questionId,
-              text_response: state.responses[questionId],
-              response_time_seconds: Math.floor((new Date().getTime() - startTime.getTime()) / 1000),
-              created_at: startTime.toISOString(),
-              updated_at: new Date().toISOString(),
-            })
+            .upsert(
+              {
+                team_id: state.team.id,
+                question_id: questionId,
+                text_response: state.responses[questionId],
+              },
+              { onConflict: "team_id, question_id" },
+            )
             .select()
             .single();
 
@@ -97,7 +96,8 @@ export const useEventStore = create<EventState>()(
           set({ isLoading: false });
         }
       },
-      setCurrentQuestionIndex: (currentQuestionIndex) => set({ currentQuestionIndex }),
+      setCurrentQuestionIndex: (currentQuestionIndex) =>
+        set({ currentQuestionIndex }),
       setIsLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
 
@@ -149,6 +149,6 @@ export const useEventStore = create<EventState>()(
     {
       name: "event-store",
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );
