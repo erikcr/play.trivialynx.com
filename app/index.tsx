@@ -357,6 +357,7 @@ function MobileHeader() {
 export default function JoinPage() {
   const { width } = useWindowDimensions();
   const isDesktop = width > 1024; // Standard desktop breakpoint
+  const { event } = useEventStore();
 
   if (isDesktop) {
     return <DesktopMessage />;
@@ -389,6 +390,20 @@ export default function JoinPage() {
                 <MobileHeader />
 
                 <Box className="px-4 md:px-0">
+                  {event && (
+                    <VStack space="md" className="mb-6 px-4">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onPress={() => router.replace(`/play?id=${event.id}`)}
+                        className="w-full"
+                      >
+                        <ButtonText>Rejoin {event.name}</ButtonText>
+                      </Button>
+                      <Text className="text-center">or join a different event below</Text>
+                    </VStack>
+                  )}
+                  
                   <JoinEventForm />
                 </Box>
               </Box>
