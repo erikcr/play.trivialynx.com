@@ -98,12 +98,24 @@ export default function PlayPage() {
     error,
     fetchRounds,
     fetchQuestions,
+    fetchEventStatus,
     setActiveRound,
     setResponse,
     submitResponse,
   } = useEventStore();
 
   const toast = useToast();
+
+  useEffect(() => {
+    if (event?.id && event.status === "pending") {
+      const checkStatus = async () => {
+        await fetchEventStatus(event.id);
+      };
+
+      // Check immediately on load
+      checkStatus();
+    }
+  }, [event?.id, event?.status, fetchEventStatus]);
 
   useEffect(() => {
     if (event?.id) {

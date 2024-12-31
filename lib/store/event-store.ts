@@ -34,6 +34,7 @@ interface EventState {
   setError: (error: string | null) => void;
   fetchRounds: (eventId: string) => Promise<void>;
   fetchQuestions: (roundId: string) => Promise<void>;
+  fetchEventStatus: (eventId: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -101,6 +102,23 @@ export const useEventStore = create<EventState>()(
       setIsLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
 
+      fetchEventStatus: async (eventId: string) => {
+        try {
+          const { data: event, error } = await supabase
+            .from("event")
+            .select("*")
+            .eq("id", eventId)
+            .single();
+
+          if (error) throw error;
+          if (event) {
+            set({ event });
+          }
+        } catch (error) {
+          set({ error: (error as Error).message });
+        }
+      },
+
       fetchRounds: async (eventId: string) => {
         const state = get();
         if (state.event?.status === "pending") {
@@ -114,7 +132,7 @@ export const useEventStore = create<EventState>()(
             .from("round")
             .select("*")
             .eq("event_id", eventId)
-            .order("order");
+            .order("sequence_number", { ascending: true });
 
           if (error) throw error;
 
