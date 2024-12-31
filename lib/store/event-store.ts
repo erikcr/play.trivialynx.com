@@ -132,6 +132,7 @@ export const useEventStore = create<EventState>()(
             .from("round")
             .select("*")
             .eq("event_id", eventId)
+            .neq("status", "pending")
             .order("sequence_number", { ascending: true });
 
           if (error) throw error;
@@ -154,6 +155,7 @@ export const useEventStore = create<EventState>()(
             .from("question")
             .select("*")
             .eq("round_id", roundId)
+            .neq("status", "pending")
             .order("sequence_number", { ascending: true });
 
           if (error) throw error;
