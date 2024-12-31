@@ -123,7 +123,7 @@ export default function PlayPage() {
   }
 
   return (
-    <Box className="flex-1 bg-background">
+    <Box className="flex-1 bg-primary">
       <StatusBar
         translucent
         barStyle="light-content"
@@ -131,30 +131,25 @@ export default function PlayPage() {
       />
 
       {/* Fixed Header */}
-      <SafeAreaView className="bg-primary">
+      <SafeAreaView>
         <Box className="px-4 py-5">
           <VStack>
-            <Text className="text-xl font-bold text-primary-foreground">
+            <Text className="text-xl font-bold text-foreground">
               TriviaLynx
             </Text>
             {event && (
-              <Text className="text-sm text-primary-foreground/80">
-                {event.name}
-              </Text>
+              <Text className="text-sm text-foreground/80">{event.name}</Text>
             )}
             {team && (
-              <Text className="text-sm text-primary-foreground/80">
+              <Text className="text-sm text-foreground/80">
                 Team: {team.name}
               </Text>
             )}
           </VStack>
         </Box>
-      </SafeAreaView>
 
-      {/* Scrollable Content */}
-      <ScrollView className="flex-1">
         {/* Rounds Section */}
-        <Box className="pt-4">
+        <Box>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -168,15 +163,15 @@ export default function PlayPage() {
                   onPress={() => setActiveRound(round)}
                   className={
                     activeRound?.id === round.id
-                      ? "bg-secondary"
-                      : "bg-transparent text-muted border-muted-foreground"
+                      ? "bg-secondary border-foreground"
+                      : "bg-transparent text-muted border-muted"
                   }
                 >
                   <ButtonText
                     className={
                       activeRound?.id === round.id
-                        ? ""
-                        : "text-muted-foreground"
+                        ? "text-foreground"
+                        : "text-muted"
                     }
                   >
                     Round {round.sequence_number}
@@ -186,9 +181,12 @@ export default function PlayPage() {
             </HStack>
           </ScrollView>
         </Box>
+      </SafeAreaView>
 
+      {/* Scrollable Content */}
+      <ScrollView className="flex-1 scrollbar-hide bg-white rounded-t-xl">
         {/* Questions Section */}
-        <VStack space="md" className="px-4 pb-8">
+        <VStack space="md" className="px-4 pt-4 pb-8">
           {activeRound && (
             <Heading size="lg" className="text-primary">
               {activeRound.name || `Round ${activeRound.sequence_number}`}
@@ -229,7 +227,7 @@ export default function PlayPage() {
                     onPress={() => handleSubmitResponse(question.id)}
                     disabled={!responses?.[question.id]}
                   >
-                    <ButtonIcon as={Save} className="text-primary-foreground" />
+                    <ButtonIcon as={Save} className="text-foreground" />
                   </Button>
                 </HStack>
               </VStack>

@@ -50,6 +50,7 @@
     "@legendapp/motion": "^2.4.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@supabase/supabase-js": "^2.47.10",
+    "@tailwindcss/forms": "^0.5.9",
     "@unitools/image": "^0.0.4",
     "@unitools/image-expo": "^0.0.5",
     "@unitools/link": "^0.0.3",
