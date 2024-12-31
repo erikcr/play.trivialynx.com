@@ -62,6 +62,28 @@ function DesktopMessage() {
   );
 }
 
+function PendingEventMessage({ scheduledAt }: { scheduledAt: string }) {
+  return (
+    <Center className="h-full bg-primary-50 dark:bg-primary-900 p-4">
+      <VStack space="xl" className="items-center">
+        <Heading size="xl" className="text-center">
+          Event Not Started Yet
+        </Heading>
+        <Text size="lg" className="text-center">
+          This event will begin on <br />{" "}
+          {new Date(scheduledAt).toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          })}
+        </Text>
+      </VStack>
+    </Center>
+  );
+}
+
 export default function PlayPage() {
   const { width } = useWindowDimensions();
   const isDesktop = width > 1024;
@@ -134,17 +156,12 @@ export default function PlayPage() {
       <SafeAreaView>
         <Box className="px-4 py-5">
           <VStack>
-            <Text className="text-xl font-bold text-foreground">
-              TriviaLynx
-            </Text>
             {event && (
-              <Text className="text-sm text-foreground/80">{event.name}</Text>
-            )}
-            {team && (
-              <Text className="text-sm text-foreground/80">
-                Team: {team.name}
+              <Text className="text-xl font-bold text-foreground">
+                {event.name}
               </Text>
             )}
+            {team && <Text className="text-foreground/80">{team.name}</Text>}
           </VStack>
         </Box>
 
@@ -185,55 +202,65 @@ export default function PlayPage() {
 
       {/* Scrollable Content */}
       <ScrollView className="flex-1 scrollbar-hide bg-white rounded-t-xl">
-        {/* Questions Section */}
-        <VStack space="md" className="px-4 pt-4 pb-8">
-          {activeRound && (
-            <Heading size="lg" className="text-primary">
-              {activeRound.name || `Round ${activeRound.sequence_number}`}
-            </Heading>
-          )}
+        {event?.status === "pending" && event.scheduled_at && (
+          <SafeAreaView className="flex-1 pt-8">
+            <StatusBar />
+            <PendingEventMessage scheduledAt={event.scheduled_at} />
+          </SafeAreaView>
+        )}
 
-          {questions.map((question) => (
-            <Box
-              key={question.id}
-              className="p-4 rounded-lg border border-border bg-card"
-            >
-              <VStack space="sm">
-                <Text className="font-semibold text-card-foreground">
-                  Question {question.sequence_number}
-                </Text>
-                <Text className="text-card-foreground">
-                  {question.question_text}
-                </Text>
-                {question.points && (
-                  <Text className="text-sm text-muted-foreground">
-                    Points: {question.points}
+        {event?.status === "ongoing" && (
+          <VStack space="md" className="px-4 pt-4 pb-8">
+            {activeRound && (
+              <Heading size="lg" className="text-primary">
+                {activeRound.name || `Round ${activeRound.sequence_number}`}
+              </Heading>
+            )}
+
+            {questions.map((question) => (
+              <Box
+                key={question.id}
+                className="p-4 rounded-lg border border-border bg-card"
+              >
+                <VStack space="sm">
+                  <Text className="font-semibold text-card-foreground">
+                    Question {question.sequence_number}
                   </Text>
-                )}
-                <HStack space="sm" className="w-full">
-                  <FormControl className="flex-1">
-                    <Input>
-                      <InputField
-                        placeholder="Enter your answer"
-                        value={responses?.[question.id] || ""}
-                        onChangeText={(text) => setResponse(question.id, text)}
-                        className="text-base placeholder:text-muted-foreground"
-                      />
-                    </Input>
-                  </FormControl>
-                  <Button
-                    variant="solid"
-                    className="bg-primary p-3.5"
-                    onPress={() => handleSubmitResponse(question.id)}
-                    disabled={!responses?.[question.id]}
-                  >
-                    <ButtonIcon as={Save} className="text-foreground" />
-                  </Button>
-                </HStack>
-              </VStack>
-            </Box>
-          ))}
-        </VStack>
+                  <Text className="text-card-foreground">
+                    {question.question_text}
+                  </Text>
+                  {question.points && (
+                    <Text className="text-sm text-muted-foreground">
+                      Points: {question.points}
+                    </Text>
+                  )}
+                  <HStack space="sm" className="w-full">
+                    <FormControl className="flex-1">
+                      <Input>
+                        <InputField
+                          placeholder="Enter your answer"
+                          value={responses?.[question.id] || ""}
+                          onChangeText={(text) =>
+                            setResponse(question.id, text)
+                          }
+                          className="text-base placeholder:text-muted-foreground"
+                        />
+                      </Input>
+                    </FormControl>
+                    <Button
+                      variant="solid"
+                      className="bg-primary p-3.5"
+                      onPress={() => handleSubmitResponse(question.id)}
+                      disabled={!responses?.[question.id]}
+                    >
+                      <ButtonIcon as={Save} className="text-foreground" />
+                    </Button>
+                  </HStack>
+                </VStack>
+              </Box>
+            ))}
+          </VStack>
+        )}
       </ScrollView>
     </Box>
   );

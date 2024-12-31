@@ -21,6 +21,7 @@ const config: Config = {
         "primary-hover": "#78350f",
         "primary-dark-hover": "#b45309",
         "foreground": "#ffffff",
+        "muted-foreground": "#9ca3af",
         "muted": "#d1d5db",
       },
     },

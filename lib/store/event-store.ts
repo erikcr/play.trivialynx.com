@@ -102,24 +102,28 @@ export const useEventStore = create<EventState>()(
       setError: (error) => set({ error }),
 
       fetchRounds: async (eventId: string) => {
+        const state = get();
+        if (state.event?.status === "pending") {
+          set({ rounds: [], activeRound: null, questions: [], error: null });
+          return;
+        }
+
         set({ isLoading: true, error: null });
         try {
-          const { data, error } = await supabase
+          const { data: rounds, error } = await supabase
             .from("round")
             .select("*")
             .eq("event_id", eventId)
-            .order("sequence_number", { ascending: true });
+            .order("order");
 
           if (error) throw error;
 
-          set({ rounds: data || [] });
-          if (data && data.length > 0 && !get().activeRound) {
-            set({ activeRound: data[0] });
-            await get().fetchQuestions(data[0].id);
+          set({ rounds: rounds || [] });
+          if (rounds && rounds.length > 0) {
+            set({ activeRound: rounds[0] });
           }
         } catch (error) {
           set({ error: (error as Error).message });
-          throw error;
         } finally {
           set({ isLoading: false });
         }

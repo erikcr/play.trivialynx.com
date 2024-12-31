@@ -216,7 +216,7 @@ const JoinEventForm = () => {
                   size="lg"
                   variant="outline"
                   isDisabled={!!code}
-                  className="bg-white dark:bg-gray-800"
+                  className="dark:bg-gray-800"
                 >
                   <InputField
                     placeholder="Enter event code"
@@ -301,7 +301,7 @@ const JoinEventForm = () => {
           onPress={handleSubmit(onSubmit)}
           className="w-full bg-primary hover:bg-primary/90 active:bg-primary/80 dark:bg-primary"
         >
-          <ButtonText className="text-base font-medium text-primary-foreground">
+          <ButtonText className="text-base font-medium text-foreground">
             Join Event
           </ButtonText>
         </Button>
