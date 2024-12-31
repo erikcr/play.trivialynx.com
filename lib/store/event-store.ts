@@ -17,6 +17,7 @@ interface EventState {
   activeRound: Round | null;
   questions: Question[];
   responses: Record<string, string>;
+  savedResponses: Record<string, boolean>;
   currentQuestionIndex: number;
   isLoading: boolean;
   error: string | null;
@@ -45,6 +46,7 @@ const initialState = {
   activeRound: null,
   questions: [],
   responses: {},
+  savedResponses: {},
   currentQuestionIndex: 0,
   isLoading: false,
   error: null,
@@ -66,6 +68,10 @@ export const useEventStore = create<EventState>()(
           responses: {
             ...state.responses,
             [questionId]: response,
+          },
+          savedResponses: {
+            ...state.savedResponses,
+            [questionId]: false,
           },
         })),
       submitResponse: async (questionId: string) => {
@@ -90,6 +96,13 @@ export const useEventStore = create<EventState>()(
             .single();
 
           if (error) throw error;
+          // Mark response as saved after successful submission
+          set((state) => ({
+            savedResponses: {
+              ...state.savedResponses,
+              [questionId]: true,
+            },
+          }));
         } catch (error) {
           set({ error: (error as Error).message });
           throw error;

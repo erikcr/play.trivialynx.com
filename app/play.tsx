@@ -121,6 +121,7 @@ export default function PlayPage() {
     activeRound,
     questions,
     responses,
+    savedResponses,
     isLoading,
     error,
     fetchRounds,
@@ -170,6 +171,10 @@ export default function PlayPage() {
       });
     }
   };
+
+  if (!isLoading && !event) {
+    router.replace("/");
+  }
 
   if (isDesktop) {
     return <DesktopMessage />;
@@ -273,35 +278,53 @@ export default function PlayPage() {
                   className="p-4 rounded-lg border border-border bg-card"
                 >
                   <VStack space="sm">
-                    <Text className="font-semibold text-card-foreground">
-                      Question {question.sequence_number}
-                    </Text>
+                    <HStack className="items-center justify-between">
+                      <Text className="font-semibold text-card-foreground">
+                        Question {question.sequence_number}
+                      </Text>
+                      {question.points && (
+                        <Text className="text-sm text-muted-foreground">
+                          Points: {question.points}
+                        </Text>
+                      )}
+                    </HStack>
                     <Text className="text-card-foreground">
                       {question.question_text}
                     </Text>
-                    {question.points && (
-                      <Text className="text-sm text-muted-foreground">
-                        Points: {question.points}
-                      </Text>
-                    )}
+
+                    <Text className="text-sm text-muted-foreground text-end">
+                      {savedResponses?.[question.id] ? "Saved" : "Unsaved"}
+                    </Text>
                     <HStack space="sm" className="w-full">
                       <FormControl className="flex-1">
                         <Input>
                           <InputField
-                            placeholder="Enter your answer"
+                            placeholder={
+                              question.status === "completed"
+                                ? "Submissions closed"
+                                : "Enter your answer"
+                            }
                             value={responses?.[question.id] || ""}
                             onChangeText={(text) =>
                               setResponse(question.id, text)
                             }
                             className="text-base placeholder:text-muted-foreground"
+                            editable={question.status === "ongoing"}
                           />
                         </Input>
                       </FormControl>
                       <Button
                         variant="solid"
-                        className="bg-primary p-3.5"
+                        className={
+                          question.status === "ongoing"
+                            ? "bg-primary p-3.5"
+                            : "hidden"
+                        }
                         onPress={() => handleSubmitResponse(question.id)}
-                        disabled={!responses?.[question.id]}
+                        disabled={
+                          !responses?.[question.id] ||
+                          question.status !== "ongoing"
+                        }
                       >
                         <ButtonIcon as={Save} className="text-foreground" />
                       </Button>
